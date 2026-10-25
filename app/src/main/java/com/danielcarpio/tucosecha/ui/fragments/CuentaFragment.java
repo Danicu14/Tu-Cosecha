@@ -4,12 +4,12 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,7 +18,9 @@ import androidx.fragment.app.Fragment;
 import com.danielcarpio.tucosecha.LoginActivity;
 import com.danielcarpio.tucosecha.R;
 import com.danielcarpio.tucosecha.RegistroActivity;
+import com.danielcarpio.tucosecha.db.DatabaseHelper;
 import com.danielcarpio.tucosecha.model.Usuario;
+import com.danielcarpio.tucosecha.util.Mensajes;
 import com.danielcarpio.tucosecha.util.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
@@ -31,7 +33,7 @@ public class CuentaFragment extends Fragment {
     private LinearLayout layoutGuestAccount, layoutLoggedAccount;
     private TextView tvUserName, tvUserEmail, tvUserRole, tvUserInitials;
     private Chip chipPlan;
-    private MaterialButton btnLogout, btnMyPlan, btnLoginFromAccount, btnRegisterFromAccount;
+    private MaterialButton btnLogout, btnMyPlan, btnCargarEjemplo, btnLoginFromAccount, btnRegisterFromAccount;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
@@ -52,6 +54,7 @@ public class CuentaFragment extends Fragment {
         chipPlan = view.findViewById(R.id.chipPlan);
         btnLogout = view.findViewById(R.id.btnLogout);
         btnMyPlan = view.findViewById(R.id.btnMyPlan);
+        btnCargarEjemplo = view.findViewById(R.id.btnCargarEjemplo);
         btnLoginFromAccount = view.findViewById(R.id.btnLoginFromAccount);
         btnRegisterFromAccount = view.findViewById(R.id.btnRegisterFromAccount);
 
@@ -77,8 +80,33 @@ public class CuentaFragment extends Fragment {
             if (SessionManager.isEsInvitado()) {
                 showGuestActionDialog();
             } else {
-                Toast.makeText(getContext(), "Sección 'Mi plan' próximamente", Toast.LENGTH_SHORT).show();
+                Mensajes.mostrarInfo(btnMyPlan, "Sección 'Mi plan' próximamente");
             }
+        });
+
+        btnCargarEjemplo.setOnClickListener(v -> {
+            btnCargarEjemplo.setEnabled(false);
+            btnCargarEjemplo.setText("Cargando datos...");
+            DatabaseHelper.cargarDatosEjemplo(new DatabaseHelper.OnDataLoadedListener() {
+                @Override
+                public void onSuccess(int count) {
+                    if (isAdded()) {
+                        btnCargarEjemplo.setEnabled(true);
+                        btnCargarEjemplo.setText("Cargar datos de ejemplo");
+                        Mensajes.mostrarExito(btnCargarEjemplo, count + " cultivos cargados");
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    if (isAdded()) {
+                        btnCargarEjemplo.setEnabled(true);
+                        btnCargarEjemplo.setText("Cargar datos de ejemplo");
+                        Log.e("CARGA_DATOS", "Error al cargar datos: " + e.getMessage(), e);
+                        Mensajes.mostrarError(btnCargarEjemplo, e.getMessage());
+                    }
+                }
+            });
         });
 
         btnLogout.setOnClickListener(v -> {
@@ -126,6 +154,13 @@ public class CuentaFragment extends Fragment {
                                 tvUserEmail.setText(usuario.getEmail());
                                 tvUserRole.setText("Rol: " + usuario.getRol());
 
+                                // Check if role is administrador (evaluated after reading user document)
+                                if ("administrador".equalsIgnoreCase(usuario.getRol())) {
+                                    btnCargarEjemplo.setVisibility(View.VISIBLE);
+                                } else {
+                                    btnCargarEjemplo.setVisibility(View.GONE);
+                                }
+
                                 String plan = usuario.getPlan() != null ? usuario.getPlan() : "ninguno";
                                 chipPlan.setText("Plan: " + plan);
 
@@ -154,7 +189,8 @@ public class CuentaFragment extends Fragment {
                         }
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(getContext(), "Error al cargar datos: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("CARGA_DATOS", "Error al cargar datos de usuario: " + e.getMessage(), e);
+                        Mensajes.mostrarError(tvUserName, "Error al cargar datos: " + e.getMessage());
                     });
         }
     }

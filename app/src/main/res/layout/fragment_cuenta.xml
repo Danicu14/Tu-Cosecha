@@ -124,8 +124,9 @@
 
                     <TextView
                         android:id="@+id/tvUserName"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnSurface"
@@ -134,8 +135,9 @@
 
                     <TextView
                         android:id="@+id/tvUserEmail"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:textSize="14sp"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:layout_marginTop="4dp" />
@@ -151,8 +153,9 @@
 
                     <TextView
                         android:id="@+id/tvUserRole"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:textSize="12sp"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         android:layout_marginTop="8dp" />
@@ -169,6 +172,16 @@
                 android:textSize="16sp"
                 app:cornerRadius="16dp"
                 android:layout_marginTop="24dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCargarEjemplo"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Cargar datos de ejemplo"
+                android:textSize="16sp"
+                app:cornerRadius="16dp"
+                android:visibility="gone"
+                android:layout_marginTop="12dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
