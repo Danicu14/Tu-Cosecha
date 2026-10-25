@@ -8,14 +8,15 @@
 
     <ImageView
         android:id="@+id/imgLogo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:src="@drawable/logo_tucosecha"
         android:contentDescription="@string/app_name"
-        android:layout_marginTop="32dp"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
         android:id="@+id/tvTitle"
@@ -25,8 +26,9 @@
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="?attr/colorPrimary"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintTop_toBottomOf="@id/imgLogo"
+        app:layout_constraintBottom_toTopOf="@id/tilEmail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -34,7 +36,7 @@
         android:id="@+id/tilEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         app:boxCornerRadiusTopStart="16dp"
         app:boxCornerRadiusTopEnd="16dp"
@@ -42,6 +44,7 @@
         app:boxCornerRadiusBottomEnd="16dp"
         app:startIconDrawable="@android:drawable/ic_dialog_email"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintBottom_toTopOf="@id/tilPassword"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -58,7 +61,7 @@
         android:id="@+id/tilPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         app:boxCornerRadiusTopStart="16dp"
         app:boxCornerRadiusTopEnd="16dp"
@@ -67,6 +70,7 @@
         app:startIconDrawable="@android:drawable/ic_lock_lock"
         app:endIconMode="password_toggle"
         app:layout_constraintTop_toBottomOf="@id/tilEmail"
+        app:layout_constraintBottom_toTopOf="@id/btnLogin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -83,11 +87,12 @@
         android:id="@+id/btnLogin"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:text="@string/login_button"
         android:textSize="16sp"
         app:cornerRadius="16dp"
         app:layout_constraintTop_toBottomOf="@id/tilPassword"
+        app:layout_constraintBottom_toTopOf="@id/tvForgotPassword"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -98,9 +103,10 @@
         android:text="@string/forgot_password"
         android:textColor="?attr/colorSecondary"
         android:textSize="14sp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:padding="8dp"
         app:layout_constraintTop_toBottomOf="@id/btnLogin"
+        app:layout_constraintBottom_toTopOf="@id/tvRegister"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -115,6 +121,23 @@
         android:layout_marginTop="8dp"
         android:padding="8dp"
         app:layout_constraintTop_toBottomOf="@id/tvForgotPassword"
+        app:layout_constraintBottom_toTopOf="@id/btnGuest"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnGuest"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="12dp"
+        android:text="Entra para conocernos"
+        android:textSize="16sp"
+        app:cornerRadius="16dp"
+        app:strokeColor="?attr/colorPrimary"
+        android:textColor="?attr/colorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/tvRegister"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
