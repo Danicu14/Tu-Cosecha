@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material 3 mappings for Dark Theme -->
+    <color name="primary">#81C784</color>
+    <color name="onPrimary">#003912</color>
+    <color name="primaryContainer">#1F5A2A</color>
+    <color name="onPrimaryContainer">#C8E6C9</color>
+
+    <color name="secondary">#BCAAA4</color>
+    <color name="onSecondary">#3E2723</color>
+    <color name="secondaryContainer">#5D4037</color>
+    <color name="onSecondaryContainer">#D7CCC8</color>
+
+    <color name="tertiary">#FFB74D</color>
+    <color name="onTertiary">#4E2C00</color>
+    <color name="tertiaryContainer">#E65100</color>
+    <color name="onTertiaryContainer">#FFE0B2</color>
+
+    <color name="background">#121412</color>
+    <color name="onBackground">#E2E3DD</color>
+    <color name="surface">#121412</color>
+    <color name="onSurface">#E2E3DD</color>
+    <color name="surfaceVariant">#2C302D</color>
+    <color name="onSurfaceVariant">#C4C7C5</color>
+
+    <color name="error">#EF9A9A</color>
+    <color name="onError">#601410</color>
+    <color name="errorContainer">#B71C1C</color>
+    <color name="onErrorContainer">#FFCDD2</color>
+</resources>

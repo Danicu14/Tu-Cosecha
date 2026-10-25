@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_cesta"
+        android:icon="@drawable/ic_cesta"
+        android:title="@string/nav_cesta" />
+    <item
+        android:id="@+id/nav_huerto"
+        android:icon="@drawable/ic_huerto"
+        android:title="@string/nav_huerto" />
+    <item
+        android:id="@+id/nav_noticias"
+        android:icon="@drawable/ic_noticias"
+        android:title="@string/nav_noticias" />
+    <item
+        android:id="@+id/nav_cuenta"
+        android:icon="@drawable/ic_cuenta"
+        android:title="@string/nav_cuenta" />
+</menu>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Tu Cosecha</string>
+    <string name="nav_cesta">Cesta</string>
+    <string name="nav_huerto">Huerto</string>
+    <string name="nav_noticias">Noticias</string>
+    <string name="nav_cuenta">Cuenta</string>
+</resources>

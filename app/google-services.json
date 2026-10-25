@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "33052067716",
+    "project_id": "tu-cosecha-50164",
+    "storage_bucket": "tu-cosecha-50164.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:33052067716:android:896b33125c5b7baf02bfd1",
+        "android_client_info": {
+          "package_name": "com.danielcarpio.tucosecha"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1AwT8mUD1drddSZnK0HHX9gjzJRKi584"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
