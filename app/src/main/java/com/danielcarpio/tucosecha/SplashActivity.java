@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class SplashActivity extends AppCompatActivity {
 
     @Override
@@ -28,9 +31,15 @@ public class SplashActivity extends AppCompatActivity {
         imgLogo.startAnimation(fadeIn);
         tvAppName.startAnimation(fadeIn);
 
-        // Navigate to MainActivity after 1.8 seconds
+        // Navigate after 1.8 seconds based on auth session
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            Intent intent;
+            if (currentUser == null) {
+                intent = new Intent(SplashActivity.this, LoginActivity.class);
+            } else {
+                intent = new Intent(SplashActivity.this, MainActivity.class);
+            }
             startActivity(intent);
             finish();
         }, 1800);

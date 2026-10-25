@@ -12,7 +12,12 @@
           "package_name": "com.danielcarpio.tucosecha"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "33052067716-3oofjmh64vh3a5si6ojcj3gjaug001h8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC1AwT8mUD1drddSZnK0HHX9gjzJRKi584"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "33052067716-3oofjmh64vh3a5si6ojcj3gjaug001h8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
