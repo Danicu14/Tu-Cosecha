@@ -16,6 +16,11 @@ public class DatabaseHelper {
         void onError(Exception e);
     }
 
+    public interface OnNoticiasLoadedListener {
+        void onSuccess(int count);
+        void onError(Exception e);
+    }
+
     public static void cargarDatosEjemplo(OnDataLoadedListener listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -58,5 +63,92 @@ public class DatabaseHelper {
                     Log.e("CARGA_DATOS", "Error al cargar cultivos: " + e.getMessage(), e);
                     listener.onError(e);
                 });
+    }
+
+    public static void cargarNoticiasEjemplo(OnNoticiasLoadedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("noticias").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                listener.onSuccess(0);
+                return;
+            }
+
+            long currentTime = System.currentTimeMillis();
+            long dayMillis = 24 * 60 * 60 * 1000L;
+
+            List<java.util.Map<String, Object>> sampleNoticias = new ArrayList<>();
+
+            java.util.Map<String, Object> n1 = new java.util.HashMap<>();
+            n1.put("titulo", "Cosecha récord de acelgas y lechugas frescas");
+            n1.put("resumen", "Esta semana hemos recolectado las mejores acelgas y lechugas crujientes de nuestra huerta talaverana.");
+            n1.put("contenido", "Gracias a las recientes lluvias y al cuidado ecológico, nuestras acelgas y lechugas han alcanzado un tamaño y sabor extraordinarios. Ya están disponibles en las cestas de nuestros suscriptores para disfrutar en casa.");
+            n1.put("categoria", "cosecha");
+            n1.put("autor", "Administrador Tu Cosecha");
+            n1.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - 1 * dayMillis)));
+            sampleNoticias.add(n1);
+
+            java.util.Map<String, Object> n2 = new java.util.HashMap<>();
+            n2.put("titulo", "Sembrando los primeros tomates de temporada");
+            n2.put("resumen", "Comenzamos la siembra de variedades tradicionales de tomate en nuestros invernaderos.");
+            n2.put("contenido", "Ya hemos iniciado el trasplante de los semilleros de tomate. Este año apostamos por variedades autóctonas que garantizan un sabor inigualable para los meses de verano.");
+            n2.put("categoria", "huerto");
+            n2.put("autor", "Administrador Tu Cosecha");
+            n2.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - 2 * dayMillis)));
+            sampleNoticias.add(n2);
+
+            java.util.Map<String, Object> n3 = new java.util.HashMap<>();
+            n3.put("titulo", "Consejos clave para el riego eficiente en invierno");
+            n3.put("resumen", "Cómo optimizar el agua de riego aprovechando la humedad ambiental de la vega del Tajo.");
+            n3.put("contenido", "Durante los meses más fríos, las plantas requieren menor frecuencia de riego pero mayor profundidad. Te contamos las mejores prácticas para mantener tus cultivos sanos sin desperdiciar recursos hídricos.");
+            n3.put("categoria", "consejos");
+            n3.put("autor", "Administrador Tu Cosecha");
+            n3.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - 3 * dayMillis)));
+            sampleNoticias.add(n3);
+
+            java.util.Map<String, Object> n4 = new java.util.HashMap<>();
+            n4.put("titulo", "Aviso importante sobre horarios de recogida en el huerto");
+            n4.put("resumen", "Actualización de los horarios de apertura y recogida de cestas para socios y suscriptores.");
+            n4.put("contenido", "Recordamos a todos nuestros suscriptores que el horario de recogida en el punto de Talavera de la Reina es de lunes a viernes de 9:00 a 14:00 y de 17:00 a 19:00 horas. ¡Os esperamos!");
+            n4.put("categoria", "aviso");
+            n4.put("autor", "Administrador Tu Cosecha");
+            n4.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - 4 * dayMillis)));
+            sampleNoticias.add(n4);
+
+            java.util.Map<String, Object> n5 = new java.util.HashMap<>();
+            n5.put("titulo", "Nuevas variedades de frutos rojos en camino");
+            n5.put("resumen", "Expandimos nuestra zona de frutales con frambuesas, moras y arándanos ecológicos.");
+            n5.put("contenido", "Hemos preparado una nueva parcela dedicada exclusivamente a frutos rojos. Las primeras plantas ya están asentadas y esperamos una primera cata piloto para la próxima primavera.");
+            n5.put("categoria", "cosecha");
+            n5.put("autor", "Administrador Tu Cosecha");
+            n5.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - 5 * dayMillis)));
+            sampleNoticias.add(n5);
+
+            java.util.Map<String, Object> n6 = new java.util.HashMap<>();
+            n6.put("titulo", "Preparando el compostaje orgánico sostenible");
+            n6.put("resumen", "Transformamos los restos de poda y hortalizas en abono natural de primera calidad.");
+            n6.put("contenido", "El ciclo del huerto es circular. Todos los restos orgánicos de cosechas anteriores son procesados en nuestra zona de compostaje para devolver los nutrientes esenciales directamente a la tierra.");
+            n6.put("categoria", "consejos");
+            n6.put("autor", "Administrador Tu Cosecha");
+            n6.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - 6 * dayMillis)));
+            sampleNoticias.add(n6);
+
+            WriteBatch batch = db.batch();
+            for (java.util.Map<String, Object> n : sampleNoticias) {
+                com.google.firebase.firestore.DocumentReference docRef = db.collection("noticias").document();
+                batch.set(docRef, n);
+            }
+
+            batch.commit()
+                    .addOnSuccessListener(aVoid -> listener.onSuccess(sampleNoticias.size()))
+                    .addOnFailureListener(e -> {
+                        Log.e("CARGA_DATOS", "Error al cargar noticias: " + e.getMessage(), e);
+                        listener.onError(e);
+                    });
+
+        }).addOnFailureListener(e -> {
+            Log.e("CARGA_DATOS", "Error al verificar noticias: " + e.getMessage(), e);
+            listener.onError(e);
+        });
     }
 }

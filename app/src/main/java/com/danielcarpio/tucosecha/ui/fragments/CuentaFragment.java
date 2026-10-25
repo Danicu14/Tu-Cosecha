@@ -33,7 +33,7 @@ public class CuentaFragment extends Fragment {
     private LinearLayout layoutGuestAccount, layoutLoggedAccount;
     private TextView tvUserName, tvUserEmail, tvUserRole, tvUserInitials;
     private Chip chipPlan;
-    private MaterialButton btnLogout, btnMyPlan, btnCargarEjemplo, btnLoginFromAccount, btnRegisterFromAccount;
+    private MaterialButton btnLogout, btnMyPlan, btnCargarEjemplo, btnCargarNoticiasEjemplo, btnLoginFromAccount, btnRegisterFromAccount;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
@@ -55,6 +55,7 @@ public class CuentaFragment extends Fragment {
         btnLogout = view.findViewById(R.id.btnLogout);
         btnMyPlan = view.findViewById(R.id.btnMyPlan);
         btnCargarEjemplo = view.findViewById(R.id.btnCargarEjemplo);
+        btnCargarNoticiasEjemplo = view.findViewById(R.id.btnCargarNoticiasEjemplo);
         btnLoginFromAccount = view.findViewById(R.id.btnLoginFromAccount);
         btnRegisterFromAccount = view.findViewById(R.id.btnRegisterFromAccount);
 
@@ -109,6 +110,35 @@ public class CuentaFragment extends Fragment {
             });
         });
 
+        btnCargarNoticiasEjemplo.setOnClickListener(v -> {
+            btnCargarNoticiasEjemplo.setEnabled(false);
+            btnCargarNoticiasEjemplo.setText("Cargando noticias...");
+            DatabaseHelper.cargarNoticiasEjemplo(new DatabaseHelper.OnNoticiasLoadedListener() {
+                @Override
+                public void onSuccess(int count) {
+                    if (isAdded()) {
+                        btnCargarNoticiasEjemplo.setEnabled(true);
+                        btnCargarNoticiasEjemplo.setText("Cargar noticias de ejemplo");
+                        if (count > 0) {
+                            Mensajes.mostrarExito(btnCargarNoticiasEjemplo, count + " noticias cargadas");
+                        } else {
+                            Mensajes.mostrarInfo(btnCargarNoticiasEjemplo, "La colección de noticias ya tiene datos.");
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    if (isAdded()) {
+                        btnCargarNoticiasEjemplo.setEnabled(true);
+                        btnCargarNoticiasEjemplo.setText("Cargar noticias de ejemplo");
+                        Log.e("CARGA_DATOS", "Error al cargar noticias: " + e.getMessage(), e);
+                        Mensajes.mostrarError(btnCargarNoticiasEjemplo, e.getMessage());
+                    }
+                }
+            });
+        });
+
         btnLogout.setOnClickListener(v -> {
             mAuth.signOut();
             SessionManager.setEsInvitado(false);
@@ -157,8 +187,10 @@ public class CuentaFragment extends Fragment {
                                 // Check if role is administrador (evaluated after reading user document)
                                 if ("administrador".equalsIgnoreCase(usuario.getRol())) {
                                     btnCargarEjemplo.setVisibility(View.VISIBLE);
+                                    btnCargarNoticiasEjemplo.setVisibility(View.VISIBLE);
                                 } else {
                                     btnCargarEjemplo.setVisibility(View.GONE);
+                                    btnCargarNoticiasEjemplo.setVisibility(View.GONE);
                                 }
 
                                 String plan = usuario.getPlan() != null ? usuario.getPlan() : "ninguno";
