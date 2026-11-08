@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.danielcarpio.tucosecha.R;
 import com.danielcarpio.tucosecha.model.Cultivo;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.chip.Chip;
 
 import java.util.List;
 import java.util.Locale;
@@ -65,39 +64,20 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.CultivoV
         double precio = cultivo.getPrecio() > 0 ? cultivo.getPrecio() : 2.50;
         holder.tvPrecio.setText(String.format(Locale.getDefault(), "%.2f €", precio));
 
-        // Phase / Unit chip
+        // Badge matching reference image precisely
         String fase = cultivo.getFase();
         if (fase != null && fase.equalsIgnoreCase("listo")) {
             holder.chipFase.setText(cultivo.getUnidadVenta() != null ? cultivo.getUnidadVenta() : "1 kg");
             holder.chipFase.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#3E8E2F")));
             holder.chipFase.setTextColor(Color.WHITE);
-        } else if (fase != null && fase.equalsIgnoreCase("creciendo")) {
-            holder.chipFase.setText("Creciendo");
-            holder.chipFase.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFB300")));
-            holder.chipFase.setTextColor(Color.BLACK);
-        } else {
-            holder.chipFase.setText("Sembrado");
+        } else if (cultivo.getEtiquetas() != null && cultivo.getEtiquetas().contains("Ecológico")) {
+            holder.chipFase.setText("Ecológico");
             holder.chipFase.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#8B5A2B")));
             holder.chipFase.setTextColor(Color.WHITE);
-        }
-
-        // Tag Chip (Temporada / Ecológico)
-        if (cultivo.getEtiquetas() != null && !cultivo.getEtiquetas().isEmpty()) {
-            String etiqueta = cultivo.getEtiquetas().get(0);
-            holder.chipEtiqueta.setText(etiqueta);
-            holder.chipEtiqueta.setVisibility(View.VISIBLE);
-            if (etiqueta.equalsIgnoreCase("temporada")) {
-                holder.chipEtiqueta.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#FFF8E1")));
-                holder.chipEtiqueta.setTextColor(Color.parseColor("#F57C1B"));
-            } else if (etiqueta.equalsIgnoreCase("ecológico")) {
-                holder.chipEtiqueta.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#EFEBE9")));
-                holder.chipEtiqueta.setTextColor(Color.parseColor("#5D4037"));
-            } else {
-                holder.chipEtiqueta.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#E8F5E9")));
-                holder.chipEtiqueta.setTextColor(Color.parseColor("#1F5A2A"));
-            }
         } else {
-            holder.chipEtiqueta.setVisibility(View.GONE);
+            holder.chipFase.setText("Temporada");
+            holder.chipFase.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFB300")));
+            holder.chipFase.setTextColor(Color.BLACK);
         }
 
         // Progress bar for Products tab
@@ -165,7 +145,6 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.CultivoV
         ImageView imgCultivo;
         TextView tvNombre, tvPrecio, tvLockBadge;
         MaterialButton chipFase, btnAddCesta;
-        Chip chipEtiqueta;
         ProgressBar progressBar;
         LinearLayout layoutProgreso;
 
@@ -177,7 +156,6 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.CultivoV
             tvLockBadge = itemView.findViewById(R.id.tvLockBadge);
             chipFase = itemView.findViewById(R.id.chipFase);
             btnAddCesta = itemView.findViewById(R.id.btnAddCesta);
-            chipEtiqueta = itemView.findViewById(R.id.chipEtiqueta);
             progressBar = itemView.findViewById(R.id.progressBarCultivo);
             layoutProgreso = itemView.findViewById(R.id.layoutProgresoCultivo);
         }

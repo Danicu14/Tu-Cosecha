@@ -57,6 +57,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Productos: Todo"
+                        app:chipIcon="@android:drawable/ic_menu_myplaces"
                         android:checked="true" />
 
                     <com.google.android.material.chip.Chip
@@ -64,6 +65,7 @@
                         style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        app:chipIcon="@android:drawable/ic_menu_my_calendar"
                         android:text="Temporada" />
 
                     <com.google.android.material.chip.Chip
@@ -71,6 +73,7 @@
                         style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        app:chipIcon="@android:drawable/ic_menu_agenda"
                         android:text="Agricultura" />
 
                 </com.google.android.material.chip.ChipGroup>
@@ -95,6 +98,7 @@
                         style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        app:chipIcon="@android:drawable/ic_menu_sort_by_size"
                         android:text="Tipo de cultivo ▼" />
 
                     <com.google.android.material.chip.Chip
@@ -102,6 +106,7 @@
                         style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        app:chipIcon="@android:drawable/ic_menu_manage"
                         android:text="Categoría ▼" />
 
                     <com.google.android.material.chip.Chip
@@ -109,6 +114,7 @@
                         style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        app:chipIcon="@android:drawable/ic_menu_sort_alphabetically"
                         android:text="Precio ▼" />
 
                 </com.google.android.material.chip.ChipGroup>

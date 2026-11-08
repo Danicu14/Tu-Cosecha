@@ -69,41 +69,19 @@
 
         </FrameLayout>
 
-        <!-- Name and Tag Chip -->
-        <LinearLayout
+        <!-- Name -->
+        <TextView
+            android:id="@+id/tvNombreCultivo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="10dp">
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:textColor="#1F5A2A"
+            android:layout_marginTop="10dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
-            <TextView
-                android:id="@+id/tvNombreCultivo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
-                android:maxLines="1"
-                android:ellipsize="end" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipEtiqueta"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Temporada"
-                android:textSize="10sp"
-                android:minHeight="24dp"
-                app:chipMinHeight="24dp"
-                app:chipBackgroundColor="#FFF8E1"
-                android:textColor="#F57C1B"
-                app:chipStrokeWidth="0dp"
-                android:visibility="gone" />
-
-        </LinearLayout>
-
-        <!-- Phase / Unit chip & Price -->
+        <!-- Phase / Unit chip & Tag chip -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -118,43 +96,52 @@
                 android:layout_height="32dp"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                app:cornerRadius="8dp"
+                app:cornerRadius="12dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:insetLeft="0dp"
-                android:insetRight="0dp"
-                app:iconSize="14dp" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/tvPrecioCultivo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorPrimary" />
+                android:insetRight="0dp" />
 
         </LinearLayout>
 
-        <!-- Progress bar for Products tab -->
+        <!-- Thin Progress bar and Price -->
         <LinearLayout
-            android:id="@+id/layoutProgresoCultivo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="8dp"
-            android:visibility="visible">
+            android:layout_marginTop="10dp">
 
-            <ProgressBar
-                android:id="@+id/progressBarCultivo"
-                style="?android:attr/progressBarStyleHorizontal"
+            <LinearLayout
+                android:id="@+id/layoutProgresoCultivo"
                 android:layout_width="match_parent"
-                android:layout_height="6dp"
-                android:progressDrawable="@drawable/custom_progress_bar" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="6dp">
+
+                <ProgressBar
+                    android:id="@+id/progressBarCultivo"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:progressDrawable="@drawable/custom_progress_bar" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <TextView
+                    android:id="@+id/tvPrecioCultivo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#1F5A2A" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
