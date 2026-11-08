@@ -38,90 +38,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Filters Row 1 -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none"
-                android:layout_marginBottom="8dp">
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroupCestaRow1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:singleSelection="true">
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipCestaAll"
-                        style="@style/Widget.TuCosecha.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Productos: Todo"
-                        app:chipIcon="@android:drawable/ic_menu_myplaces"
-                        android:checked="true" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipCestaTemporada"
-                        style="@style/Widget.TuCosecha.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:chipIcon="@android:drawable/ic_menu_my_calendar"
-                        android:text="Temporada" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipCestaAgricultura"
-                        style="@style/Widget.TuCosecha.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:chipIcon="@android:drawable/ic_menu_agenda"
-                        android:text="Agricultura" />
-
-                </com.google.android.material.chip.ChipGroup>
-
-            </HorizontalScrollView>
-
-            <!-- Filters Row 2 -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none"
-                android:layout_marginBottom="16dp">
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroupCestaRow2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:singleSelection="true">
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipCestaTipoCultivo"
-                        style="@style/Widget.TuCosecha.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:chipIcon="@android:drawable/ic_menu_sort_by_size"
-                        android:text="Tipo de cultivo" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipCestaCategoria"
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:chipIcon="@android:drawable/ic_menu_manage"
-                        android:text="Categoría" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipCestaPrecio"
-                        style="@style/Widget.Material3.Chip.Filter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:chipIcon="@android:drawable/ic_menu_sort_alphabetically"
-                        android:text="Precio" />
-
-                </com.google.android.material.chip.ChipGroup>
-
-            </HorizontalScrollView>
-
-            <!-- Loading / Empty / Error states -->
+            <!-- Loading / Empty states -->
             <ProgressBar
                 android:id="@+id/progressCestaLoading"
                 android:layout_width="wrap_content"
@@ -134,7 +51,7 @@
                 android:id="@+id/tvCestaEmpty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="No hay productos disponibles"
+                android:text="No hay productos listos para cosechar esta semana"
                 android:textSize="16sp"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:gravity="center"
@@ -182,10 +99,10 @@
                 android:textColor="?attr/colorPrimary" />
 
             <TextView
-                android:id="@+id/tvCestaResumenPrecio"
+                android:id="@+id/tvCestaResumenPlan"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total estimado: 0,00 €"
+                android:text="Incluido en tu plan"
                 android:textSize="13sp"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:layout_marginTop="2dp" />

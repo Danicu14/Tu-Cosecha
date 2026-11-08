@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,8 +25,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class HuertoFragment extends Fragment {
 
@@ -45,6 +49,7 @@ public class HuertoFragment extends Fragment {
 
     private String selectedPhase = "todo";
     private String selectedCategory = "todo";
+    private String sortOrder = "listos"; // "listos", "az", "za"
 
     @Nullable
     @Override
@@ -65,7 +70,7 @@ public class HuertoFragment extends Fragment {
         rvCultivos.setLayoutManager(new GridLayoutManager(getContext(), 2));
         allCultivos = new ArrayList<>();
         filteredCultivos = new ArrayList<>();
-        adapter = new CultivoAdapter(getContext(), filteredCultivos, false, null, "ninguno", cultivo -> {
+        adapter = new CultivoAdapter(getContext(), filteredCultivos, false, null, "ninguno", null, cultivo -> {
             DetalleCultivoBottomSheet bottomSheet = DetalleCultivoBottomSheet.newInstance(cultivo);
             bottomSheet.show(getParentFragmentManager(), "DetalleCultivoBottomSheet");
         }, null);
@@ -85,7 +90,7 @@ public class HuertoFragment extends Fragment {
             } else if (checkedId == R.id.chipPhaseSembrado) {
                 selectedPhase = "sembrado";
             }
-            filterCultivos();
+            filterAndSortCultivos();
         });
 
         chipGroupCategory.setOnCheckedChangeListener((group, checkedId) -> {
@@ -96,8 +101,25 @@ public class HuertoFragment extends Fragment {
             } else if (checkedId == R.id.chipCategoryFruta) {
                 selectedCategory = "fruta";
             }
-            filterCultivos();
+            filterAndSortCultivos();
         });
+
+        // Setup sort chip if present
+        View chipOrdenar = view.findViewById(R.id.chipOrdenar);
+        if (chipOrdenar != null) {
+            chipOrdenar.setOnClickListener(v -> {
+                String[] opciones = {"Más listos primero", "A-Z", "Z-A"};
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Ordenar productos")
+                        .setItems(opciones, (dialog, which) -> {
+                            if (which == 0) sortOrder = "listos";
+                            else if (which == 1) sortOrder = "az";
+                            else if (which == 2) sortOrder = "za";
+                            filterAndSortCultivos();
+                        })
+                        .show();
+            });
+        }
 
         return view;
     }
@@ -141,12 +163,12 @@ public class HuertoFragment extends Fragment {
 
                 tvSummary.setText(listosCount + " cultivos listos para cosechar · " + allCultivos.size() + " en total");
 
-                filterCultivos();
+                filterAndSortCultivos();
             }
         });
     }
 
-    private void filterCultivos() {
+    private void filterAndSortCultivos() {
         filteredCultivos.clear();
         for (Cultivo c : allCultivos) {
             boolean matchesPhase = selectedPhase.equals("todo") || (c.getFase() != null && c.getFase().equalsIgnoreCase(selectedPhase));
@@ -156,6 +178,27 @@ public class HuertoFragment extends Fragment {
                 filteredCultivos.add(c);
             }
         }
+
+        // Sorting: "Más listos primero" (listo, creciendo, sembrado, alphabetically by name)
+        Collator collator = Collator.getInstance(new Locale("es", "ES"));
+        collator.setStrength(Collator.PRIMARY);
+
+        Collections.sort(filteredCultivos, (o1, o2) -> {
+            if (sortOrder.equals("az")) {
+                return collator.compare(o1.getNombre(), o2.getNombre());
+            } else if (sortOrder.equals("za")) {
+                return collator.compare(o2.getNombre(), o1.getNombre());
+            } else {
+                // "listos" default order: listo -> creciendo -> sembrado, then alphabetical
+                int p1 = getPhasePriority(o1.getFase());
+                int p2 = getPhasePriority(o2.getFase());
+                if (p1 != p2) {
+                    return Integer.compare(p1, p2);
+                }
+                return collator.compare(o1.getNombre(), o2.getNombre());
+            }
+        });
+
         adapter.notifyDataSetChanged();
 
         if (filteredCultivos.isEmpty()) {
@@ -165,6 +208,13 @@ public class HuertoFragment extends Fragment {
             tvEmptyState.setVisibility(View.GONE);
             rvCultivos.setVisibility(View.VISIBLE);
         }
+    }
+
+    private int getPhasePriority(String fase) {
+        if (fase == null) return 3;
+        if (fase.equalsIgnoreCase("listo")) return 1;
+        if (fase.equalsIgnoreCase("creciendo")) return 2;
+        return 3; // sembrado
     }
 
     @Override

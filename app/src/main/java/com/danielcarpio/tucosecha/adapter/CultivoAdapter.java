@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.danielcarpio.tucosecha.R;
 import com.danielcarpio.tucosecha.model.Cultivo;
+import com.danielcarpio.tucosecha.model.ProductoCosecha;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
@@ -39,13 +40,15 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.CultivoV
     private final boolean selectionMode;
     private final List<Cultivo> selectedCultivos;
     private final String userPlan;
+    private final List<ProductoCosecha> harvestProducts;
 
-    public CultivoAdapter(Context context, List<Cultivo> cultivoList, boolean selectionMode, List<Cultivo> selectedCultivos, String userPlan, OnCultivoClickListener clickListener, OnCultivoSelectListener selectListener) {
+    public CultivoAdapter(Context context, List<Cultivo> cultivoList, boolean selectionMode, List<Cultivo> selectedCultivos, String userPlan, List<ProductoCosecha> harvestProducts, OnCultivoClickListener clickListener, OnCultivoSelectListener selectListener) {
         this.context = context;
         this.cultivoList = cultivoList;
         this.selectionMode = selectionMode;
         this.selectedCultivos = selectedCultivos;
         this.userPlan = userPlan != null ? userPlan.toLowerCase() : "ninguno";
+        this.harvestProducts = harvestProducts;
         this.clickListener = clickListener;
         this.selectListener = selectListener;
     }
@@ -62,10 +65,8 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.CultivoV
         Cultivo cultivo = cultivoList.get(position);
 
         holder.tvNombre.setText(cultivo.getNombre());
-        double precio = cultivo.getPrecio() > 0 ? cultivo.getPrecio() : 2.50;
-        holder.tvPrecio.setText(String.format(Locale.getDefault(), "%.2f €", precio));
 
-        // 1. Etiqueta de la tarjeta (TextView con fondo redondeado radio 12dp, altura 24dp, text 11sp bold, padding horizontal 8dp)
+        // 1. Etiqueta de la tarjeta
         String fase = cultivo.getFase();
         String displayTag;
         int tagBgColor;
@@ -99,7 +100,7 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.CultivoV
         holder.tvTag.setBackground(shape);
         holder.tvTag.setTextColor(tagTextColor);
 
-        // Opacidad 0.55 y etiqueta "Pronto" si no está listo
+        // Opacidad y badge Pronto
         if (fase != null && fase.equalsIgnoreCase("listo")) {
             holder.viewOpacityOverlay.setVisibility(View.GONE);
             holder.tvProntoBadge.setVisibility(View.GONE);
@@ -108,12 +109,41 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.CultivoV
             holder.tvProntoBadge.setVisibility(View.VISIBLE);
         }
 
-        // Progress bar for Products tab vs Mi Cesta
+        // 3. Precio / Cantidad / Estado
         if (selectionMode) {
             holder.layoutProgreso.setVisibility(View.GONE);
+            String qtyText = "";
+            if (userPlan.equalsIgnoreCase("ninguno") || userPlan.equalsIgnoreCase("invitado")) {
+                qtyText = "● Listo";
+                holder.tvPrecio.setTextColor(Color.parseColor("#3E8E2F"));
+            } else {
+                double qty = 0;
+                if (harvestProducts != null) {
+                    for (ProductoCosecha p : harvestProducts) {
+                        if (p.getNombre().equalsIgnoreCase(cultivo.getNombre())) {
+                            if (userPlan.contains("basico")) qty = p.getCantidadBasico();
+                            else if (userPlan.contains("familiar")) qty = p.getCantidadFamiliar();
+                            else if (userPlan.contains("premium")) qty = p.getCantidadPremium();
+                            break;
+                        }
+                    }
+                }
+                if (qty > 0) {
+                    qtyText = (qty == (int) qty ? String.valueOf((int) qty) : String.valueOf(qty)) + " " + (cultivo.getUnidadVenta() != null ? cultivo.getUnidadVenta() : "ud");
+                }
+                holder.tvPrecio.setTextColor(Color.parseColor("#1F5A2A"));
+            }
+            holder.tvPrecio.setText(qtyText);
         } else {
             holder.layoutProgreso.setVisibility(View.VISIBLE);
             holder.progressBar.setProgress(cultivo.getProgreso());
+            if (fase != null && fase.equalsIgnoreCase("listo")) {
+                holder.tvPrecio.setText("● Listo");
+                holder.tvPrecio.setTextColor(Color.parseColor("#3E8E2F"));
+            } else {
+                holder.tvPrecio.setText(cultivo.getProgreso() + "%");
+                holder.tvPrecio.setTextColor(Color.parseColor("#6B7A5E"));
+            }
         }
 
         // Selection mode (+ button) for Crea tu Cesta

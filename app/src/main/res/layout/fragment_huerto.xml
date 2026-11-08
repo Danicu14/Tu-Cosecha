@@ -83,7 +83,7 @@
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
-    <!-- Filter Category ChipGroup -->
+    <!-- Filter Category ChipGroup & Ordenar -->
     <HorizontalScrollView
         android:id="@+id/scrollCategoryFilters"
         android:layout_width="0dp"
@@ -123,6 +123,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Frutas" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipOrdenar"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:chipIcon="@android:drawable/ic_menu_sort_by_size"
+                android:text="Ordenar" />
 
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>

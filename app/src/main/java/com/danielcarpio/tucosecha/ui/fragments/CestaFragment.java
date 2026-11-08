@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,11 +17,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.danielcarpio.tucosecha.PlanesActivity;
 import com.danielcarpio.tucosecha.R;
 import com.danielcarpio.tucosecha.adapter.CultivoAdapter;
+import com.danielcarpio.tucosecha.model.Cosecha;
 import com.danielcarpio.tucosecha.model.Cultivo;
+import com.danielcarpio.tucosecha.model.ProductoCosecha;
 import com.danielcarpio.tucosecha.util.Mensajes;
 import com.danielcarpio.tucosecha.util.SessionManager;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.chip.Chip;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,36 +30,29 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 public class CestaFragment extends Fragment {
 
     private RecyclerView rvCestaCultivos;
     private ProgressBar progressCestaLoading;
-    private TextView tvCestaEmpty, tvCestaResumenVariedades, tvCestaResumenPrecio;
+    private TextView tvCestaEmpty, tvCestaResumenVariedades, tvCestaResumenPlan;
     private MaterialButton btnCestaAction;
-    private Chip chipCestaAll, chipCestaTemporada, chipCestaAgricultura, chipCestaTipoCultivo, chipCestaCategoria, chipCestaPrecio;
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private ListenerRegistration cultivosListener;
+    private ListenerRegistration harvestListener;
     private ListenerRegistration userListener;
 
-    private List<Cultivo> allCultivos;
-    private List<Cultivo> filteredCultivos;
+    private List<Cultivo> listoCultivos;
     private List<Cultivo> selectedCultivos;
+    private List<ProductoCosecha> activeHarvestProducts;
     private CultivoAdapter adapter;
 
     private String userPlan = "ninguno";
-    private int maxVariedades = 4; // default basic or none
-
-    private boolean filterTemporada = false;
-    private boolean filterEcolologico = false;
-    private String filterTipoCultivo = "todos";
-    private String filterCategoria = "todas";
-    private String sortPrecio = "ninguno"; // "asc", "desc"
+    private int maxVariedades = 4;
+    private String planNombre = "Ninguno";
 
     @Nullable
     @Override
@@ -73,43 +66,36 @@ public class CestaFragment extends Fragment {
         progressCestaLoading = view.findViewById(R.id.progressCestaLoading);
         tvCestaEmpty = view.findViewById(R.id.tvCestaEmpty);
         tvCestaResumenVariedades = view.findViewById(R.id.tvCestaResumenVariedades);
-        tvCestaResumenPrecio = view.findViewById(R.id.tvCestaResumenPrecio);
+        tvCestaResumenPlan = view.findViewById(R.id.tvCestaResumenPlan);
         btnCestaAction = view.findViewById(R.id.btnCestaAction);
 
-        chipCestaAll = view.findViewById(R.id.chipCestaAll);
-        chipCestaTemporada = view.findViewById(R.id.chipCestaTemporada);
-        chipCestaAgricultura = view.findViewById(R.id.chipCestaAgricultura);
-        chipCestaTipoCultivo = view.findViewById(R.id.chipCestaTipoCultivo);
-        chipCestaCategoria = view.findViewById(R.id.chipCestaCategoria);
-        chipCestaPrecio = view.findViewById(R.id.chipCestaPrecio);
-
         rvCestaCultivos.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        allCultivos = new ArrayList<>();
-        filteredCultivos = new ArrayList<>();
+        listoCultivos = new ArrayList<>();
         selectedCultivos = new ArrayList<>();
-
-        setupFilters();
+        activeHarvestProducts = new ArrayList<>();
 
         if (SessionManager.isEsInvitado()) {
             userPlan = "invitado";
             maxVariedades = 0;
-            setupBottomBarForGuestOrNoPlan();
-            loadCultivosRealtime();
+            planNombre = "Invitado";
+            setupBottomBar();
+            loadDataRealtime();
         } else {
-            checkUserSubscriptionAndLoadCultivos();
+            checkUserSubscriptionAndLoadData();
         }
 
         return view;
     }
 
-    private void setupBottomBarForGuestOrNoPlan() {
+    private void setupBottomBar() {
         if (userPlan.equalsIgnoreCase("ninguno") || userPlan.equalsIgnoreCase("invitado")) {
-            tvCestaResumenVariedades.setText("Explora los productos de la huerta");
-            tvCestaResumenPrecio.setText("Suscríbete para crear tu cesta");
+            tvCestaResumenVariedades.setText("Tu cesta: 0 variedades");
+            tvCestaResumenPlan.setText("Elige un plan para crear tu cesta");
             btnCestaAction.setText("Ver planes");
             btnCestaAction.setOnClickListener(v -> startActivity(new Intent(getActivity(), PlanesActivity.class)));
         } else {
             updateResumenBar();
+            tvCestaResumenPlan.setText("Incluido en tu plan " + planNombre);
             btnCestaAction.setText("Confirmar cesta");
             btnCestaAction.setOnClickListener(v -> {
                 if (selectedCultivos.isEmpty()) {
@@ -122,15 +108,10 @@ public class CestaFragment extends Fragment {
     }
 
     private void updateResumenBar() {
-        double total = 0;
-        for (Cultivo c : selectedCultivos) {
-            total += c.getPrecio();
-        }
         tvCestaResumenVariedades.setText("Tu cesta: " + selectedCultivos.size() + " de " + maxVariedades + " variedades");
-        tvCestaResumenPrecio.setText(String.format(Locale.getDefault(), "Total estimado: %.2f €", total));
     }
 
-    private void checkUserSubscriptionAndLoadCultivos() {
+    private void checkUserSubscriptionAndLoadData() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             if (userListener != null) userListener.remove();
@@ -143,33 +124,65 @@ public class CestaFragment extends Fragment {
                             userPlan = documentSnapshot.getString("plan");
                             if (userPlan == null) userPlan = "ninguno";
 
-                            if (userPlan.equalsIgnoreCase("basico")) maxVariedades = 4;
-                            else if (userPlan.equalsIgnoreCase("familiar")) maxVariedades = 6;
-                            else if (userPlan.equalsIgnoreCase("premium")) maxVariedades = 8;
-                            else maxVariedades = 0;
+                            if (userPlan.equalsIgnoreCase("basico")) {
+                                maxVariedades = 4;
+                                planNombre = "Básico";
+                            } else if (userPlan.equalsIgnoreCase("familiar")) {
+                                maxVariedades = 6;
+                                planNombre = "Familiar";
+                            } else if (userPlan.equalsIgnoreCase("premium")) {
+                                maxVariedades = 8;
+                                planNombre = "Premium";
+                            } else {
+                                maxVariedades = 0;
+                                planNombre = "Ninguno";
+                            }
 
-                            setupBottomBarForGuestOrNoPlan();
-                            loadCultivosRealtime();
+                            setupBottomBar();
+                            loadDataRealtime();
                         }
                     });
         } else {
             userPlan = "ninguno";
             maxVariedades = 0;
-            setupBottomBarForGuestOrNoPlan();
-            loadCultivosRealtime();
+            planNombre = "Ninguno";
+            setupBottomBar();
+            loadDataRealtime();
         }
     }
 
-    private void loadCultivosRealtime() {
+    private void loadDataRealtime() {
         progressCestaLoading.setVisibility(View.VISIBLE);
         tvCestaEmpty.setVisibility(View.GONE);
         rvCestaCultivos.setVisibility(View.GONE);
 
+        if (harvestListener != null) harvestListener.remove();
         if (cultivosListener != null) cultivosListener.remove();
 
+        harvestListener = db.collection("cosechas")
+                .whereEqualTo("activa", true)
+                .addSnapshotListener((value, error) -> {
+                    if (!isAdded()) return;
+
+                    activeHarvestProducts.clear();
+                    if (value != null && !value.isEmpty()) {
+                        for (QueryDocumentSnapshot doc : value) {
+                            Cosecha cosecha = doc.toObject(Cosecha.class);
+                            if (cosecha.getProductos() != null) {
+                                activeHarvestProducts.addAll(cosecha.getProductos());
+                            }
+                            break;
+                        }
+                    }
+
+                    loadCultivos();
+                });
+    }
+
+    private void loadCultivos() {
         boolean selectionMode = !userPlan.equalsIgnoreCase("ninguno") && !userPlan.equalsIgnoreCase("invitado");
 
-        adapter = new CultivoAdapter(getContext(), filteredCultivos, selectionMode, selectedCultivos, userPlan, cultivo -> {
+        adapter = new CultivoAdapter(getContext(), listoCultivos, selectionMode, selectedCultivos, userPlan, activeHarvestProducts, cultivo -> {
             DetalleCultivoBottomSheet bottomSheet = DetalleCultivoBottomSheet.newInstance(cultivo);
             bottomSheet.show(getParentFragmentManager(), "DetalleCultivoBottomSheet");
         }, (cultivo, isSelected) -> {
@@ -188,119 +201,53 @@ public class CestaFragment extends Fragment {
 
         rvCestaCultivos.setAdapter(adapter);
 
-        cultivosListener = db.collection("cultivos").addSnapshotListener((value, error) -> {
-            if (!isAdded()) return;
+        cultivosListener = db.collection("cultivos")
+                .whereEqualTo("fase", "listo")
+                .addSnapshotListener((value, error) -> {
+                    if (!isAdded()) return;
 
-            progressCestaLoading.setVisibility(View.GONE);
+                    progressCestaLoading.setVisibility(View.GONE);
 
-            if (value != null) {
-                allCultivos.clear();
-                for (QueryDocumentSnapshot doc : value) {
-                    Cultivo cultivo = doc.toObject(Cultivo.class);
-                    if (cultivo.getId() == null || cultivo.getId().isEmpty()) {
-                        cultivo.setId(doc.getId());
+                    if (value != null) {
+                        listoCultivos.clear();
+                        for (QueryDocumentSnapshot doc : value) {
+                            Cultivo cultivo = doc.toObject(Cultivo.class);
+                            if (cultivo.getId() == null || cultivo.getId().isEmpty()) {
+                                cultivo.setId(doc.getId());
+                            }
+
+                            if (selectionMode) {
+                                boolean hasQuantity = false;
+                                for (ProductoCosecha p : activeHarvestProducts) {
+                                    if (p.getNombre().equalsIgnoreCase(cultivo.getNombre())) {
+                                        double cant = 0;
+                                        if (userPlan.contains("basico")) cant = p.getCantidadBasico();
+                                        else if (userPlan.contains("familiar")) cant = p.getCantidadFamiliar();
+                                        else if (userPlan.contains("premium")) cant = p.getCantidadPremium();
+
+                                        if (cant > 0) hasQuantity = true;
+                                        break;
+                                    }
+                                }
+                                if (hasQuantity) {
+                                    listoCultivos.add(cultivo);
+                                }
+                            } else {
+                                listoCultivos.add(cultivo);
+                            }
+                        }
+
+                        adapter.notifyDataSetChanged();
+
+                        if (listoCultivos.isEmpty()) {
+                            tvCestaEmpty.setVisibility(View.VISIBLE);
+                            rvCestaCultivos.setVisibility(View.GONE);
+                        } else {
+                            tvCestaEmpty.setVisibility(View.GONE);
+                            rvCestaCultivos.setVisibility(View.VISIBLE);
+                        }
                     }
-                    allCultivos.add(cultivo);
-                }
-                filterAndSortCultivos();
-            }
-        });
-    }
-
-    private void setupFilters() {
-        chipCestaAll.setOnClickListener(v -> {
-            filterTemporada = false;
-            filterEcolologico = false;
-            filterTipoCultivo = "todos";
-            filterCategoria = "todas";
-            sortPrecio = "ninguno";
-            chipCestaTemporada.setChecked(false);
-            chipCestaAgricultura.setChecked(false);
-            chipCestaTipoCultivo.setText("Tipo de cultivo ▼");
-            chipCestaCategoria.setText("Categoría ▼");
-            chipCestaPrecio.setText("Precio ▼");
-            filterAndSortCultivos();
-        });
-
-        chipCestaTemporada.setOnClickListener(v -> {
-            filterTemporada = chipCestaTemporada.isChecked();
-            filterAndSortCultivos();
-        });
-
-        chipCestaAgricultura.setOnClickListener(v -> {
-            filterEcolologico = chipCestaAgricultura.isChecked();
-            filterAndSortCultivos();
-        });
-
-        chipCestaTipoCultivo.setOnClickListener(v -> {
-            String[] tipos = {"Todos", "Hoja", "Raíz", "Fruto", "Bulbo", "Inflorescencia", "Frutal"};
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Filtrar por tipo de cultivo")
-                    .setItems(tipos, (dialog, which) -> {
-                        filterTipoCultivo = tipos[which].toLowerCase();
-                        if (filterTipoCultivo.equals("todos")) filterTipoCultivo = "todos";
-                        chipCestaTipoCultivo.setText(tipos[which] + " ▼");
-                        filterAndSortCultivos();
-                    })
-                    .show();
-        });
-
-        chipCestaCategoria.setOnClickListener(v -> {
-            String[] categorias = {"Todas", "Hortaliza", "Fruta"};
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Filtrar por categoría")
-                    .setItems(categorias, (dialog, which) -> {
-                        filterCategoria = categorias[which].toLowerCase();
-                        if (filterCategoria.equals("todas")) filterCategoria = "todas";
-                        chipCestaCategoria.setText(categorias[which] + " ▼");
-                        filterAndSortCultivos();
-                    })
-                    .show();
-        });
-
-        chipCestaPrecio.setOnClickListener(v -> {
-            String[] orden = {"Por defecto", "Menor a mayor precio", "Mayor a menor precio"};
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Ordenar por precio")
-                    .setItems(orden, (dialog, which) -> {
-                        if (which == 0) sortPrecio = "ninguno";
-                        else if (which == 1) sortPrecio = "asc";
-                        else if (which == 2) sortPrecio = "desc";
-                        chipCestaPrecio.setText(orden[which] + " ▼");
-                        filterAndSortCultivos();
-                    })
-                    .show();
-        });
-    }
-
-    private void filterAndSortCultivos() {
-        filteredCultivos.clear();
-        for (Cultivo c : allCultivos) {
-            boolean matchesTemporada = !filterTemporada || (c.getEtiquetas() != null && c.getEtiquetas().contains("Temporada"));
-            boolean matchesEcolologico = !filterEcolologico || (c.getEtiquetas() != null && c.getEtiquetas().contains("Ecológico"));
-            boolean matchesTipo = filterTipoCultivo.equals("todos") || (c.getTipoCultivo() != null && c.getTipoCultivo().equalsIgnoreCase(filterTipoCultivo));
-            boolean matchesCat = filterCategoria.equals("todas") || (c.getCategoria() != null && c.getCategoria().equalsIgnoreCase(filterCategoria));
-
-            if (matchesTemporada && matchesEcolologico && matchesTipo && matchesCat) {
-                filteredCultivos.add(c);
-            }
-        }
-
-        if (sortPrecio.equals("asc")) {
-            Collections.sort(filteredCultivos, (o1, o2) -> Double.compare(o1.getPrecio(), o2.getPrecio()));
-        } else if (sortPrecio.equals("desc")) {
-            Collections.sort(filteredCultivos, (o1, o2) -> Double.compare(o2.getPrecio(), o1.getPrecio()));
-        }
-
-        if (adapter != null) adapter.notifyDataSetChanged();
-
-        if (filteredCultivos.isEmpty()) {
-            tvCestaEmpty.setVisibility(View.VISIBLE);
-            rvCestaCultivos.setVisibility(View.GONE);
-        } else {
-            tvCestaEmpty.setVisibility(View.GONE);
-            rvCestaCultivos.setVisibility(View.VISIBLE);
-        }
+                });
     }
 
     @Override
@@ -309,6 +256,10 @@ public class CestaFragment extends Fragment {
         if (cultivosListener != null) {
             cultivosListener.remove();
             cultivosListener = null;
+        }
+        if (harvestListener != null) {
+            harvestListener.remove();
+            harvestListener = null;
         }
         if (userListener != null) {
             userListener.remove();
