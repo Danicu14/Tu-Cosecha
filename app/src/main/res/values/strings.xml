@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Tu Cosecha</string>
-    <string name="nav_cesta">Cesta</string>
-    <string name="nav_huerto">Huerto</string>
+    <string name="nav_cesta">Mi Cesta</string>
+    <string name="nav_huerto">Productos</string>
     <string name="nav_noticias">Noticias</string>
-    <string name="nav_cuenta">Cuenta</string>
+    <string name="nav_cuenta">Mi Zona</string>
 
     <!-- Auth Strings -->
     <string name="email_hint">Correo electrónico</string>
@@ -33,5 +33,5 @@
     <string name="error_register_failed">Error al registrar usuario.</string>
 
     <string name="logout">Cerrar sesión</string>
-    <string name="user_info_loading">Cargando información del usuario...</string>
+    <string name="user_info_loading">Cargando información del usuario…</string>
 </resources>

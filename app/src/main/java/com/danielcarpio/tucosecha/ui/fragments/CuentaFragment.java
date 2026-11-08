@@ -35,7 +35,8 @@ public class CuentaFragment extends Fragment {
     private LinearLayout layoutGuestAccount, layoutLoggedAccount;
     private TextView tvUserName, tvUserEmail, tvUserInitials;
     private Chip chipPlan;
-    private MaterialButton btnLogout, btnMyPlan, btnCargarEjemplo, btnCargarNoticiasEjemplo, btnCargarPlanesEjemplo, btnCargarCosechaEjemplo, btnLoginFromAccount, btnRegisterFromAccount;
+    private MaterialButton btnLogout, btnCargarEjemplo, btnCargarNoticiasEjemplo, btnCargarPlanesEjemplo, btnCargarCosechaEjemplo, btnLoginFromAccount, btnRegisterFromAccount;
+    private View btnMyPlan;
     private MaterialCardView cardAdminTools;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;

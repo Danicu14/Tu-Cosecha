@@ -65,10 +65,10 @@ public class HuertoFragment extends Fragment {
         rvCultivos.setLayoutManager(new GridLayoutManager(getContext(), 2));
         allCultivos = new ArrayList<>();
         filteredCultivos = new ArrayList<>();
-        adapter = new CultivoAdapter(getContext(), filteredCultivos, cultivo -> {
+        adapter = new CultivoAdapter(getContext(), filteredCultivos, false, null, "ninguno", cultivo -> {
             DetalleCultivoBottomSheet bottomSheet = DetalleCultivoBottomSheet.newInstance(cultivo);
             bottomSheet.show(getParentFragmentManager(), "DetalleCultivoBottomSheet");
-        });
+        }, null);
         rvCultivos.setAdapter(adapter);
 
         loadCultivosRealtime();
