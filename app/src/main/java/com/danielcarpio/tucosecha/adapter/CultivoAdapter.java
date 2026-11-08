@@ -3,6 +3,7 @@ package com.danielcarpio.tucosecha.adapter;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,23 +65,50 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.CultivoV
         double precio = cultivo.getPrecio() > 0 ? cultivo.getPrecio() : 2.50;
         holder.tvPrecio.setText(String.format(Locale.getDefault(), "%.2f €", precio));
 
-        // Badge matching reference image precisely
+        // 1. Etiqueta de la tarjeta (TextView con fondo redondeado radio 12dp, altura 24dp, text 11sp bold, padding horizontal 8dp)
         String fase = cultivo.getFase();
+        String displayTag;
+        int tagBgColor;
+        int tagTextColor;
+
         if (fase != null && fase.equalsIgnoreCase("listo")) {
-            holder.chipFase.setText(cultivo.getUnidadVenta() != null ? cultivo.getUnidadVenta() : "1 kg");
-            holder.chipFase.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#3E8E2F")));
-            holder.chipFase.setTextColor(Color.WHITE);
-        } else if (cultivo.getEtiquetas() != null && cultivo.getEtiquetas().contains("Ecológico")) {
-            holder.chipFase.setText("Ecológico");
-            holder.chipFase.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#8B5A2B")));
-            holder.chipFase.setTextColor(Color.WHITE);
+            displayTag = cultivo.getUnidadVenta() != null ? cultivo.getUnidadVenta() : "1 kg";
+            tagBgColor = Color.parseColor("#3E8E2F");
+            tagTextColor = Color.WHITE;
+        } else if (cultivo.getEtiquetas() != null && !cultivo.getEtiquetas().isEmpty()) {
+            String etiqueta = cultivo.getEtiquetas().get(0);
+            displayTag = etiqueta;
+            if (etiqueta.equalsIgnoreCase("ecológico")) {
+                tagBgColor = Color.parseColor("#8B5A2B");
+                tagTextColor = Color.WHITE;
+            } else {
+                tagBgColor = Color.parseColor("#FFB300");
+                tagTextColor = Color.BLACK;
+            }
         } else {
-            holder.chipFase.setText("Temporada");
-            holder.chipFase.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFB300")));
-            holder.chipFase.setTextColor(Color.BLACK);
+            displayTag = "Temporada";
+            tagBgColor = Color.parseColor("#FFB300");
+            tagTextColor = Color.BLACK;
         }
 
-        // Progress bar for Products tab
+        holder.tvTag.setText(displayTag);
+        GradientDrawable shape = new GradientDrawable();
+        shape.setShape(GradientDrawable.RECTANGLE);
+        shape.setCornerRadius(12 * context.getResources().getDisplayMetrics().density);
+        shape.setColor(tagBgColor);
+        holder.tvTag.setBackground(shape);
+        holder.tvTag.setTextColor(tagTextColor);
+
+        // Opacidad 0.55 y etiqueta "Pronto" si no está listo
+        if (fase != null && fase.equalsIgnoreCase("listo")) {
+            holder.viewOpacityOverlay.setVisibility(View.GONE);
+            holder.tvProntoBadge.setVisibility(View.GONE);
+        } else {
+            holder.viewOpacityOverlay.setVisibility(View.VISIBLE);
+            holder.tvProntoBadge.setVisibility(View.VISIBLE);
+        }
+
+        // Progress bar for Products tab vs Mi Cesta
         if (selectionMode) {
             holder.layoutProgreso.setVisibility(View.GONE);
         } else {
@@ -143,18 +171,21 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.CultivoV
 
     public static class CultivoViewHolder extends RecyclerView.ViewHolder {
         ImageView imgCultivo;
-        TextView tvNombre, tvPrecio, tvLockBadge;
-        MaterialButton chipFase, btnAddCesta;
+        View viewOpacityOverlay;
+        TextView tvNombre, tvPrecio, tvLockBadge, tvTag, tvProntoBadge;
+        MaterialButton btnAddCesta;
         ProgressBar progressBar;
         LinearLayout layoutProgreso;
 
         public CultivoViewHolder(@NonNull View itemView) {
             super(itemView);
             imgCultivo = itemView.findViewById(R.id.imgCultivo);
+            viewOpacityOverlay = itemView.findViewById(R.id.viewOpacityOverlay);
             tvNombre = itemView.findViewById(R.id.tvNombreCultivo);
             tvPrecio = itemView.findViewById(R.id.tvPrecioCultivo);
             tvLockBadge = itemView.findViewById(R.id.tvLockBadge);
-            chipFase = itemView.findViewById(R.id.chipFase);
+            tvTag = itemView.findViewById(R.id.tvTagCultivo);
+            tvProntoBadge = itemView.findViewById(R.id.tvProntoBadge);
             btnAddCesta = itemView.findViewById(R.id.btnAddCesta);
             progressBar = itemView.findViewById(R.id.progressBarCultivo);
             layoutProgreso = itemView.findViewById(R.id.layoutProgresoCultivo);

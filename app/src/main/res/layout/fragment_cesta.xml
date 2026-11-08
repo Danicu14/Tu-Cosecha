@@ -53,7 +53,7 @@
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipCestaAll"
-                        style="@style/Widget.Material3.Chip.Filter"
+                        style="@style/Widget.TuCosecha.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Productos: Todo"
@@ -62,7 +62,7 @@
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipCestaTemporada"
-                        style="@style/Widget.Material3.Chip.Filter"
+                        style="@style/Widget.TuCosecha.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:chipIcon="@android:drawable/ic_menu_my_calendar"
@@ -70,7 +70,7 @@
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipCestaAgricultura"
-                        style="@style/Widget.Material3.Chip.Filter"
+                        style="@style/Widget.TuCosecha.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:chipIcon="@android:drawable/ic_menu_agenda"
@@ -95,11 +95,11 @@
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipCestaTipoCultivo"
-                        style="@style/Widget.Material3.Chip.Filter"
+                        style="@style/Widget.TuCosecha.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:chipIcon="@android:drawable/ic_menu_sort_by_size"
-                        android:text="Tipo de cultivo ▼" />
+                        android:text="Tipo de cultivo" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipCestaCategoria"
@@ -107,7 +107,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:chipIcon="@android:drawable/ic_menu_manage"
-                        android:text="Categoría ▼" />
+                        android:text="Categoría" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chipCestaPrecio"
@@ -115,7 +115,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:chipIcon="@android:drawable/ic_menu_sort_alphabetically"
-                        android:text="Precio ▼" />
+                        android:text="Precio" />
 
                 </com.google.android.material.chip.ChipGroup>
 
@@ -156,11 +156,11 @@
     <LinearLayout
         android:id="@+id/layoutBottomCestaBar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="72dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:background="?attr/colorSurface"
-        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:paddingHorizontal="20dp"
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -176,7 +176,7 @@
                 android:id="@+id/tvCestaResumenVariedades"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tu cesta: 0 de 4 variedades"
+                android:text="Tu cesta: 0 de 8 variedades"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorPrimary" />
@@ -196,8 +196,10 @@
             android:id="@+id/btnCestaAction"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
+            android:minWidth="150dp"
             android:text="Confirmar cesta"
-            android:textSize="14sp"
+            android:textSize="15sp"
+            android:textStyle="bold"
             app:cornerRadius="24dp" />
 
     </LinearLayout>

@@ -99,9 +99,29 @@
         <item name="strokeColor">#E4EAD8</item>
     </style>
 
+    <style name="Widget.TuCosecha.Chip.Filter" parent="Widget.Material3.Chip.Filter">
+        <item name="android:backgroundTint">@color/chip_background_selector</item>
+        <item name="android:textColor">@color/chip_text_selector</item>
+        <item name="android:textSize">13sp</item>
+        <item name="chipMinHeight">36dp</item>
+        <item name="ensureMinTouchTargetSize">false</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipStrokeColor">@color/chip_stroke_selector</item>
+        <item name="iconTint">@color/chip_icon_selector</item>
+        <item name="chipIconTint">@color/chip_icon_selector</item>
+    </style>
+
     <style name="ShapeAppearance.TuCosecha.Rounded20" parent="ShapeAppearance.Material3.MediumComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">20dp</item>
+    </style>
+
+    <style name="ShapeAppearance.TuCosecha.TopRounded16" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
     </style>
 
     <style name="Theme.TuCosecha" parent="Base.Theme.TuCosecha" />

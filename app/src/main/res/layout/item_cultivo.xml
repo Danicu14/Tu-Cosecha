@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardBackgroundColor="@color/surface"
+    android:layout_margin="6dp"
+    app:cardBackgroundColor="#FFFFFF"
     app:cardCornerRadius="20dp"
-    app:cardElevation="1dp"
+    app:cardElevation="2dp"
     app:strokeWidth="1dp"
     app:strokeColor="#E4EAD8">
 
@@ -14,41 +14,57 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="0dp">
 
-        <!-- Image Container with optional + button or badge -->
+        <!-- Image Container -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="140dp">
 
-            <com.google.android.material.card.MaterialCardView
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imgCultivo"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp">
+                android:layout_height="140dp"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.TuCosecha.TopRounded16"
+                android:contentDescription="@string/app_name" />
 
-                <ImageView
-                    android:id="@+id/imgCultivo"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:contentDescription="@string/app_name" />
+            <!-- Non-ready overlay & Pronto badge -->
+            <View
+                android:id="@+id/viewOpacityOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:background="#88000000"
+                android:visibility="gone" />
 
-            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/tvProntoBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_margin="8dp"
+                android:text="Pronto"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="#8B5A2B"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:visibility="gone" />
 
             <!-- Add / Select Button for Crea tu Cesta -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddCesta"
                 style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="top|end"
                 android:layout_margin="8dp"
                 app:icon="@android:drawable/ic_input_add"
                 app:iconTint="@android:color/white"
-                android:backgroundTint="@color/verde_principal"
-                app:cornerRadius="20dp"
+                android:backgroundTint="#3E8E2F"
+                app:cornerRadius="16dp"
+                android:elevation="4dp"
                 android:visibility="gone" />
 
             <!-- Lock badge for scarce products -->
@@ -69,77 +85,73 @@
 
         </FrameLayout>
 
-        <!-- Name -->
-        <TextView
-            android:id="@+id/tvNombreCultivo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:textColor="#1F5A2A"
-            android:layout_marginTop="10dp"
-            android:maxLines="1"
-            android:ellipsize="end" />
-
-        <!-- Phase / Unit chip & Tag chip -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="8dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/chipFase"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:cornerRadius="12dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:insetLeft="0dp"
-                android:insetRight="0dp" />
-
-        </LinearLayout>
-
-        <!-- Thin Progress bar and Price -->
+        <!-- Content Block with 12dp padding -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="10dp">
+            android:padding="12dp">
 
+            <!-- Name in 15sp semibold -->
+            <TextView
+                android:id="@+id/tvNombreCultivo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#1F5A2A"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- Tag TextView -->
+            <TextView
+                android:id="@+id/tvTagCultivo"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="8dp"
+                android:layout_marginTop="6dp" />
+
+            <!-- Row with 3dp progress line and price -->
             <LinearLayout
-                android:id="@+id/layoutProgresoCultivo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="6dp">
+                android:layout_marginTop="10dp">
 
-                <ProgressBar
-                    android:id="@+id/progressBarCultivo"
-                    style="?android:attr/progressBarStyleHorizontal"
+                <LinearLayout
+                    android:id="@+id/layoutProgresoCultivo"
                     android:layout_width="match_parent"
-                    android:layout_height="4dp"
-                    android:progressDrawable="@drawable/custom_progress_bar" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="end">
-
-                <TextView
-                    android:id="@+id/tvPrecioCultivo"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textColor="#1F5A2A" />
+                    android:orientation="vertical"
+                    android:layout_marginBottom="6dp">
+
+                    <ProgressBar
+                        android:id="@+id/progressBarCultivo"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="3dp"
+                        android:progressDrawable="@drawable/custom_progress_bar" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="end">
+
+                    <TextView
+                        android:id="@+id/tvPrecioCultivo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#1F5A2A" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
