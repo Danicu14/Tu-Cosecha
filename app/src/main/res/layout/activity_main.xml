@@ -1,276 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/navHostFragment"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/layoutCustomBottomNav"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_weight="1" />
 
-    <!-- Custom Bottom Navigation Bar matching reference photo precisely -->
+    <!-- Custom Bottom Navigation Bar -->
     <LinearLayout
         android:id="@+id/layoutCustomBottomNav"
-        android:layout_width="0dp"
-        android:layout_height="72dp"
+        android:layout_width="match_parent"
+        android:layout_height="76dp"
         android:orientation="horizontal"
-        android:background="#FFFFFF"
-        android:elevation="8dp"
-        android:gravity="center_vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:background="@drawable/bg_custom_bottom_bar"
+        android:elevation="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="6dp"
+        android:gravity="center_vertical">
 
-        <!-- Tab 1: Mi Cesta -->
+        <!-- Item 1: Mi Cesta -->
         <LinearLayout
-            android:id="@+id/navTabCesta"
+            android:id="@+id/navCesta"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:paddingTop="6dp"
-            android:paddingBottom="4dp"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:background="?attr/selectableItemBackgroundBorderless">
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center">
-
-                <View
-                    android:id="@+id/indicatorPillCesta"
-                    android:layout_width="56dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_nav_pill_active"
-                    android:layout_gravity="center"
-                    android:visibility="visible" />
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/nav_mi_cesta"
-                    android:scaleType="fitCenter"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/app_name" />
-            </FrameLayout>
+            <ImageView
+                android:id="@+id/imgCesta"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/nav_mi_cesta"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/app_name" />
 
             <TextView
-                android:id="@+id/tvLabelCesta"
+                android:id="@+id/tvCesta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Mi Cesta"
                 android:textSize="11sp"
-                android:textStyle="bold"
-                android:textColor="#1F5A2A"
+                android:maxLines="1"
+                android:gravity="center"
                 android:layout_marginTop="2dp" />
 
             <View
-                android:id="@+id/indicatorLineCesta"
-                android:layout_width="24dp"
+                android:id="@+id/lineCesta"
+                android:layout_width="22dp"
                 android:layout_height="3dp"
-                android:background="#3E8E2F"
-                android:layout_marginTop="2dp"
-                android:visibility="visible" />
+                android:background="@drawable/bg_indicator_line"
+                android:layout_marginTop="3dp"
+                android:visibility="invisible" />
 
         </LinearLayout>
 
-        <!-- Divider 1 -->
-        <View
-            android:layout_width="1dp"
-            android:layout_height="36dp"
-            android:layout_gravity="center_vertical"
-            android:background="#E4EAD8" />
-
-        <!-- Tab 2: Productos -->
+        <!-- Item 2: Productos -->
         <LinearLayout
-            android:id="@+id/navTabProductos"
+            android:id="@+id/navProductos"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:paddingTop="6dp"
-            android:paddingBottom="4dp"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:background="?attr/selectableItemBackgroundBorderless">
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center">
-
-                <View
-                    android:id="@+id/indicatorPillProductos"
-                    android:layout_width="56dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_nav_pill_active"
-                    android:layout_gravity="center"
-                    android:visibility="gone" />
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/nav_productos"
-                    android:scaleType="fitCenter"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/app_name" />
-            </FrameLayout>
+            <ImageView
+                android:id="@+id/imgProductos"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/nav_productos"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/app_name" />
 
             <TextView
-                android:id="@+id/tvLabelProductos"
+                android:id="@+id/tvProductos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Productos"
                 android:textSize="11sp"
-                android:textColor="#6B7A5E"
+                android:maxLines="1"
+                android:gravity="center"
                 android:layout_marginTop="2dp" />
 
             <View
-                android:id="@+id/indicatorLineProductos"
-                android:layout_width="24dp"
+                android:id="@+id/lineProductos"
+                android:layout_width="22dp"
                 android:layout_height="3dp"
-                android:background="#3E8E2F"
-                android:layout_marginTop="2dp"
-                android:visibility="gone" />
+                android:background="@drawable/bg_indicator_line"
+                android:layout_marginTop="3dp"
+                android:visibility="invisible" />
 
         </LinearLayout>
 
-        <!-- Divider 2 -->
-        <View
-            android:layout_width="1dp"
-            android:layout_height="36dp"
-            android:layout_gravity="center_vertical"
-            android:background="#E4EAD8" />
-
-        <!-- Tab 3: Noticias -->
+        <!-- Item 3: Noticias -->
         <LinearLayout
-            android:id="@+id/navTabNoticias"
+            android:id="@+id/navNoticias"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:paddingTop="6dp"
-            android:paddingBottom="4dp"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:background="?attr/selectableItemBackgroundBorderless">
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center">
-
-                <View
-                    android:id="@+id/indicatorPillNoticias"
-                    android:layout_width="56dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_nav_pill_active"
-                    android:layout_gravity="center"
-                    android:visibility="gone" />
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/nav_noticias"
-                    android:scaleType="fitCenter"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/app_name" />
-            </FrameLayout>
+            <ImageView
+                android:id="@+id/imgNoticias"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/nav_noticias"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/app_name" />
 
             <TextView
-                android:id="@+id/tvLabelNoticias"
+                android:id="@+id/tvNoticias"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Noticias"
                 android:textSize="11sp"
-                android:textColor="#6B7A5E"
+                android:maxLines="1"
+                android:gravity="center"
                 android:layout_marginTop="2dp" />
 
             <View
-                android:id="@+id/indicatorLineNoticias"
-                android:layout_width="24dp"
+                android:id="@+id/lineNoticias"
+                android:layout_width="22dp"
                 android:layout_height="3dp"
-                android:background="#3E8E2F"
-                android:layout_marginTop="2dp"
-                android:visibility="gone" />
+                android:background="@drawable/bg_indicator_line"
+                android:layout_marginTop="3dp"
+                android:visibility="invisible" />
 
         </LinearLayout>
 
-        <!-- Divider 3 -->
-        <View
-            android:layout_width="1dp"
-            android:layout_height="36dp"
-            android:layout_gravity="center_vertical"
-            android:background="#E4EAD8" />
-
-        <!-- Tab 4: Mi Zona -->
+        <!-- Item 4: Mi Zona -->
         <LinearLayout
-            android:id="@+id/navTabMiZona"
+            android:id="@+id/navZona"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:paddingTop="6dp"
-            android:paddingBottom="4dp"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground">
+            android:background="?attr/selectableItemBackgroundBorderless">
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center">
-
-                <View
-                    android:id="@+id/indicatorPillMiZona"
-                    android:layout_width="56dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_nav_pill_active"
-                    android:layout_gravity="center"
-                    android:visibility="gone" />
-
-                <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:src="@drawable/nav_mi_zona"
-                    android:scaleType="fitCenter"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/app_name" />
-            </FrameLayout>
+            <ImageView
+                android:id="@+id/imgZona"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/nav_mi_zona"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/app_name" />
 
             <TextView
-                android:id="@+id/tvLabelMiZona"
+                android:id="@+id/tvZona"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Mi Zona"
                 android:textSize="11sp"
-                android:textColor="#6B7A5E"
+                android:maxLines="1"
+                android:gravity="center"
                 android:layout_marginTop="2dp" />
 
             <View
-                android:id="@+id/indicatorLineMiZona"
-                android:layout_width="24dp"
+                android:id="@+id/lineZona"
+                android:layout_width="22dp"
                 android:layout_height="3dp"
-                android:background="#3E8E2F"
-                android:layout_marginTop="2dp"
-                android:visibility="gone" />
+                android:background="@drawable/bg_indicator_line"
+                android:layout_marginTop="3dp"
+                android:visibility="invisible" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

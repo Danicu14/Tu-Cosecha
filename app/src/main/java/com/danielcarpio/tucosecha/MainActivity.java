@@ -3,12 +3,15 @@ package com.danielcarpio.tucosecha;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
 import com.danielcarpio.tucosecha.ui.fragments.CestaFragment;
 import com.danielcarpio.tucosecha.ui.fragments.CuentaFragment;
@@ -17,70 +20,50 @@ import com.danielcarpio.tucosecha.ui.fragments.NoticiasFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    private View pillCesta, pillProductos, pillNoticias, pillMiZona;
-    private View lineCesta, lineProductos, lineNoticias, lineMiZona;
-    private TextView tvCesta, tvProductos, tvNoticias, tvMiZona;
+    private static final String KEY_SELECTED_TAB = "selected_tab";
+    private int currentPosition = 0;
+
+    private View tabCesta, tabProductos, tabNoticias, tabZona;
+    private ImageView imgCesta, imgProductos, imgNoticias, imgZona;
+    private TextView tvCesta, tvProductos, tvNoticias, tvZona;
+    private View lineCesta, lineProductos, lineNoticias, lineZona;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        View tabCesta = findViewById(R.id.navTabCesta);
-        View tabProductos = findViewById(R.id.navTabProductos);
-        View tabNoticias = findViewById(R.id.navTabNoticias);
-        View tabMiZona = findViewById(R.id.navTabMiZona);
+        tabCesta = findViewById(R.id.navCesta);
+        tabProductos = findViewById(R.id.navProductos);
+        tabNoticias = findViewById(R.id.navNoticias);
+        tabZona = findViewById(R.id.navZona);
 
-        pillCesta = findViewById(R.id.indicatorPillCesta);
-        pillProductos = findViewById(R.id.indicatorPillProductos);
-        pillNoticias = findViewById(R.id.indicatorPillNoticias);
-        pillMiZona = findViewById(R.id.indicatorPillMiZona);
+        imgCesta = findViewById(R.id.imgCesta);
+        imgProductos = findViewById(R.id.imgProductos);
+        imgNoticias = findViewById(R.id.imgNoticias);
+        imgZona = findViewById(R.id.imgZona);
 
-        lineCesta = findViewById(R.id.indicatorLineCesta);
-        lineProductos = findViewById(R.id.indicatorLineProductos);
-        lineNoticias = findViewById(R.id.indicatorLineNoticias);
-        lineMiZona = findViewById(R.id.indicatorLineMiZona);
+        tvCesta = findViewById(R.id.tvCesta);
+        tvProductos = findViewById(R.id.tvProductos);
+        tvNoticias = findViewById(R.id.tvNoticias);
+        tvZona = findViewById(R.id.tvZona);
 
-        tvCesta = findViewById(R.id.tvLabelCesta);
-        tvProductos = findViewById(R.id.tvLabelProductos);
-        tvNoticias = findViewById(R.id.tvLabelNoticias);
-        tvMiZona = findViewById(R.id.tvLabelMiZona);
+        lineCesta = findViewById(R.id.lineCesta);
+        lineProductos = findViewById(R.id.lineProductos);
+        lineNoticias = findViewById(R.id.lineNoticias);
+        lineZona = findViewById(R.id.lineZona);
 
-        // Load default fragment on start
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.navHostFragment, new CestaFragment())
-                    .commit();
-            updateTabSelection(0);
+        tabCesta.setOnClickListener(v -> seleccionar(0));
+        tabProductos.setOnClickListener(v -> seleccionar(1));
+        tabNoticias.setOnClickListener(v -> seleccionar(2));
+        tabZona.setOnClickListener(v -> seleccionar(3));
+
+        if (savedInstanceState != null) {
+            currentPosition = savedInstanceState.getInt(KEY_SELECTED_TAB, 0);
+            seleccionar(currentPosition);
+        } else {
+            seleccionar(0);
         }
-
-        tabCesta.setOnClickListener(v -> {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.navHostFragment, new CestaFragment())
-                    .commit();
-            updateTabSelection(0);
-        });
-
-        tabProductos.setOnClickListener(v -> {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.navHostFragment, new HuertoFragment())
-                    .commit();
-            updateTabSelection(1);
-        });
-
-        tabNoticias.setOnClickListener(v -> {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.navHostFragment, new NoticiasFragment())
-                    .commit();
-            updateTabSelection(2);
-        });
-
-        tabMiZona.setOnClickListener(v -> {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.navHostFragment, new CuentaFragment())
-                    .commit();
-            updateTabSelection(3);
-        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -89,25 +72,81 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void updateTabSelection(int index) {
-        pillCesta.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
-        lineCesta.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
-        tvCesta.setTextColor(index == 0 ? Color.parseColor("#1F5A2A") : Color.parseColor("#6B7A5E"));
-        tvCesta.getPaint().setFakeBoldText(index == 0);
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_SELECTED_TAB, currentPosition);
+    }
 
-        pillProductos.setVisibility(index == 1 ? View.VISIBLE : View.GONE);
-        lineProductos.setVisibility(index == 1 ? View.VISIBLE : View.GONE);
-        tvProductos.setTextColor(index == 1 ? Color.parseColor("#1F5A2A") : Color.parseColor("#6B7A5E"));
-        tvProductos.getPaint().setFakeBoldText(index == 1);
+    private void seleccionar(int posicion) {
+        currentPosition = posicion;
+        Fragment fragment;
 
-        pillNoticias.setVisibility(index == 2 ? View.VISIBLE : View.GONE);
-        lineNoticias.setVisibility(index == 2 ? View.VISIBLE : View.GONE);
-        tvNoticias.setTextColor(index == 2 ? Color.parseColor("#1F5A2A") : Color.parseColor("#6B7A5E"));
-        tvNoticias.getPaint().setFakeBoldText(index == 2);
+        switch (posicion) {
+            case 0:
+                fragment = new CestaFragment();
+                break;
+            case 1:
+                fragment = new HuertoFragment();
+                break;
+            case 2:
+                fragment = new NoticiasFragment();
+                break;
+            case 3:
+            default:
+                fragment = new CuentaFragment();
+                break;
+        }
 
-        pillMiZona.setVisibility(index == 3 ? View.VISIBLE : View.GONE);
-        lineMiZona.setVisibility(index == 3 ? View.VISIBLE : View.GONE);
-        tvMiZona.setTextColor(index == 3 ? Color.parseColor("#1F5A2A") : Color.parseColor("#6B7A5E"));
-        tvMiZona.getPaint().setFakeBoldText(index == 3);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.navHostFragment, fragment)
+                .commit();
+
+        updateNavUI(posicion);
+    }
+
+    private void updateNavUI(int activePos) {
+        int activeTextColor = Color.parseColor("#1F5A2A");
+        int inactiveTextColor = Color.parseColor("#6B7A5E");
+
+        // Item 0: Cesta
+        boolean isCesta = (activePos == 0);
+        animateItem(imgCesta, isCesta);
+        tvCesta.setTextColor(isCesta ? activeTextColor : inactiveTextColor);
+        tvCesta.getPaint().setFakeBoldText(isCesta);
+        lineCesta.setVisibility(isCesta ? View.VISIBLE : View.INVISIBLE);
+
+        // Item 1: Productos
+        boolean isProductos = (activePos == 1);
+        animateItem(imgProductos, isProductos);
+        tvProductos.setTextColor(isProductos ? activeTextColor : inactiveTextColor);
+        tvProductos.getPaint().setFakeBoldText(isProductos);
+        lineProductos.setVisibility(isProductos ? View.VISIBLE : View.INVISIBLE);
+
+        // Item 2: Noticias
+        boolean isNoticias = (activePos == 2);
+        animateItem(imgNoticias, isNoticias);
+        tvNoticias.setTextColor(isNoticias ? activeTextColor : inactiveTextColor);
+        tvNoticias.getPaint().setFakeBoldText(isNoticias);
+        lineNoticias.setVisibility(isNoticias ? View.VISIBLE : View.INVISIBLE);
+
+        // Item 3: Mi Zona
+        boolean isZona = (activePos == 3);
+        animateItem(imgZona, isZona);
+        tvZona.setTextColor(isZona ? activeTextColor : inactiveTextColor);
+        tvZona.getPaint().setFakeBoldText(isZona);
+        lineZona.setVisibility(isZona ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    private void animateItem(View iconView, boolean active) {
+        float scale = active ? 1.1f : 1.0f;
+        float alpha = active ? 1.0f : 0.7f;
+
+        iconView.animate()
+                .scaleX(scale)
+                .scaleY(scale)
+                .alpha(alpha)
+                .setDuration(150)
+                .start();
     }
 }
