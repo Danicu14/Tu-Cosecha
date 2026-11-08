@@ -8,21 +8,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="24dp">
-
-        <TextView
-            android:id="@+id/tvAccountTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/nav_cuenta"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="?attr/colorPrimary"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_height="wrap_content">
 
         <!-- Guest Account View -->
         <LinearLayout
@@ -31,9 +17,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
+            android:padding="24dp"
             android:layout_marginTop="64dp"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/tvAccountTitle"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
@@ -41,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="¡Hola, invitado!"
-                android:textSize="22sp"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="?attr/colorPrimary"
                 android:gravity="center" />
@@ -50,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Inicia sesión o regístrate para acceder a tu perfil, gestionar tus suscripciones y disfrutar de todas las ventajas de Tú Cosecha."
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textColor="?attr/colorOnSurfaceVariant"
                 android:gravity="center"
                 android:layout_marginTop="16dp"
@@ -59,22 +46,16 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLoginFromAccount"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="52dp"
                 android:text="Iniciar sesión"
-                android:textSize="16sp"
-                app:cornerRadius="16dp"
                 android:layout_marginBottom="16dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRegisterFromAccount"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.TuCosecha.Button.Outlined"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Crear cuenta"
-                android:textSize="16sp"
-                app:cornerRadius="16dp"
-                app:strokeColor="?attr/colorPrimary"
-                android:textColor="?attr/colorPrimary" />
+                android:layout_height="52dp"
+                android:text="Crear cuenta" />
 
         </LinearLayout>
 
@@ -85,162 +66,189 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@id/tvAccountTitle"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardUserInfo"
+            <!-- Gradient Header -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:background="@drawable/bg_account_header_gradient"
+                android:paddingVertical="32dp"
+                android:paddingHorizontal="24dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center_horizontal"
-                    android:padding="24dp">
-
-                    <!-- Avatar Circle with Initials -->
-                    <FrameLayout
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:background="@drawable/bg_circle_avatar">
-
-                        <TextView
-                            android:id="@+id/tvUserInitials"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="TC"
-                            android:textColor="@android:color/white"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-                    </FrameLayout>
+                <!-- Avatar Circle with Initials -->
+                <FrameLayout
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@drawable/bg_circle_avatar">
 
                     <TextView
-                        android:id="@+id/tvUserName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorOnSurface"
-                        android:layout_marginTop="16dp"
-                        android:text="@string/user_info_loading" />
-
-                    <TextView
-                        android:id="@+id/tvUserEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="14sp"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginTop="4dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipPlan"
+                        android:id="@+id/tvUserInitials"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Plan: Ninguno"
-                        android:layout_marginTop="12dp"
-                        app:chipBackgroundColor="@color/surfaceVariant"
-                        app:chipStrokeWidth="0dp" />
+                        android:layout_gravity="center"
+                        android:text="TC"
+                        android:textColor="@android:color/white"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
 
-                    <TextView
-                        android:id="@+id/tvUserRole"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="12sp"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:layout_marginTop="8dp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnMyPlan"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Mi plan"
-                android:textSize="16sp"
-                app:cornerRadius="16dp"
-                android:layout_marginTop="24dp" />
-
-            <!-- Admin Tools Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAdminTools"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp"
-                android:visibility="gone">
-
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tvUserName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:gravity="center"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/user_info_loading" />
 
-                    <TextView
+                <TextView
+                    android:id="@+id/tvUserEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="14sp"
+                    android:textColor="#E0E0E0"
+                    android:layout_marginTop="4dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipPlan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Plan: Ninguno"
+                    android:layout_marginTop="12dp"
+                    app:chipBackgroundColor="@color/verde_claro"
+                    android:textColor="@color/verde_oscuro"
+                    app:chipStrokeWidth="0dp" />
+
+            </LinearLayout>
+
+            <!-- Options List -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Mi plan option -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardOptionMiPlan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <LinearLayout
+                        android:id="@+id/btnMyPlan"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Herramientas de administrador"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorPrimary"
-                        android:layout_marginBottom="16dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="16dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCargarEjemplo"
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_cesta"
+                            app:tint="?attr/colorPrimary"
+                            android:contentDescription="@string/app_name" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Mi plan"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorOnSurface"
+                            android:layout_marginStart="16dp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Admin Tools Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardAdminTools"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:text="Cargar datos de ejemplo"
-                        android:textSize="14sp"
-                        app:cornerRadius="12dp"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCargarNoticiasEjemplo"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:text="Cargar noticias de ejemplo"
-                        android:textSize="14sp"
-                        app:cornerRadius="12dp"
-                        android:layout_marginBottom="8dp" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Herramientas de administrador"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/colorPrimary"
+                            android:layout_marginBottom="12dp" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCargarPlanesEjemplo"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:text="Cargar planes de ejemplo"
-                        android:textSize="14sp"
-                        app:cornerRadius="12dp" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnCargarEjemplo"
+                            style="@style/Widget.TuCosecha.Button.Tonal"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:text="Cargar datos de ejemplo"
+                            android:textSize="13sp"
+                            android:layout_marginBottom="8dp" />
 
-                </LinearLayout>
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnCargarNoticiasEjemplo"
+                            style="@style/Widget.TuCosecha.Button.Tonal"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:text="Cargar noticias de ejemplo"
+                            android:textSize="13sp"
+                            android:layout_marginBottom="8dp" />
 
-            </com.google.android.material.card.MaterialCardView>
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnCargarPlanesEjemplo"
+                            style="@style/Widget.TuCosecha.Button.Tonal"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:text="Cargar planes de ejemplo"
+                            android:textSize="13sp"
+                            android:layout_marginBottom="8dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLogout"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="@string/logout"
-                android:textSize="16sp"
-                app:cornerRadius="16dp"
-                app:strokeColor="@color/rojo_tomate"
-                android:textColor="@color/rojo_tomate"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnCargarCosechaEjemplo"
+                            style="@style/Widget.TuCosecha.Button.Tonal"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:text="Cargar cosecha de ejemplo"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Cerrar sesión as red text button at bottom -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLogout"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="@string/logout"
+                    android:textColor="@color/rojo_tomate"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

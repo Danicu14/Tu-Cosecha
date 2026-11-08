@@ -28,10 +28,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -87,23 +84,18 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCambiarPlan"
+                style="@style/Widget.TuCosecha.Button.Tonal"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="52dp"
                 android:text="Cambiar de plan"
-                android:textSize="16sp"
-                app:cornerRadius="16dp"
                 android:layout_marginTop="24dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancelarSuscripcion"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.TuCosecha.Button.Destructive"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="52dp"
                 android:text="Cancelar suscripción"
-                android:textSize="16sp"
-                app:cornerRadius="16dp"
-                app:strokeColor="@color/rojo_tomate"
-                android:textColor="@color/rojo_tomate"
                 android:layout_marginTop="12dp" />
 
         </LinearLayout>

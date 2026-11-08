@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.danielcarpio.tucosecha.LoginActivity;
+import com.danielcarpio.tucosecha.MiPlanActivity;
 import com.danielcarpio.tucosecha.R;
 import com.danielcarpio.tucosecha.RegistroActivity;
 import com.danielcarpio.tucosecha.db.DatabaseHelper;
@@ -32,9 +33,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class CuentaFragment extends Fragment {
 
     private LinearLayout layoutGuestAccount, layoutLoggedAccount;
-    private TextView tvUserName, tvUserEmail, tvUserRole, tvUserInitials;
+    private TextView tvUserName, tvUserEmail, tvUserInitials;
     private Chip chipPlan;
-    private MaterialButton btnLogout, btnMyPlan, btnCargarEjemplo, btnCargarNoticiasEjemplo, btnCargarPlanesEjemplo, btnLoginFromAccount, btnRegisterFromAccount;
+    private MaterialButton btnLogout, btnMyPlan, btnCargarEjemplo, btnCargarNoticiasEjemplo, btnCargarPlanesEjemplo, btnCargarCosechaEjemplo, btnLoginFromAccount, btnRegisterFromAccount;
     private MaterialCardView cardAdminTools;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -51,7 +52,6 @@ public class CuentaFragment extends Fragment {
         layoutLoggedAccount = view.findViewById(R.id.layoutLoggedAccount);
         tvUserName = view.findViewById(R.id.tvUserName);
         tvUserEmail = view.findViewById(R.id.tvUserEmail);
-        tvUserRole = view.findViewById(R.id.tvUserRole);
         tvUserInitials = view.findViewById(R.id.tvUserInitials);
         chipPlan = view.findViewById(R.id.chipPlan);
         btnLogout = view.findViewById(R.id.btnLogout);
@@ -59,6 +59,7 @@ public class CuentaFragment extends Fragment {
         btnCargarEjemplo = view.findViewById(R.id.btnCargarEjemplo);
         btnCargarNoticiasEjemplo = view.findViewById(R.id.btnCargarNoticiasEjemplo);
         btnCargarPlanesEjemplo = view.findViewById(R.id.btnCargarPlanesEjemplo);
+        btnCargarCosechaEjemplo = view.findViewById(R.id.btnCargarCosechaEjemplo);
         cardAdminTools = view.findViewById(R.id.cardAdminTools);
         btnLoginFromAccount = view.findViewById(R.id.btnLoginFromAccount);
         btnRegisterFromAccount = view.findViewById(R.id.btnRegisterFromAccount);
@@ -85,7 +86,7 @@ public class CuentaFragment extends Fragment {
             if (SessionManager.isEsInvitado()) {
                 showGuestActionDialog();
             } else {
-                Mensajes.mostrarInfo(btnMyPlan, "Sección 'Mi plan' próximamente");
+                startActivity(new Intent(getActivity(), MiPlanActivity.class));
             }
         });
 
@@ -172,6 +173,31 @@ public class CuentaFragment extends Fragment {
             });
         });
 
+        btnCargarCosechaEjemplo.setOnClickListener(v -> {
+            btnCargarCosechaEjemplo.setEnabled(false);
+            btnCargarCosechaEjemplo.setText("Cargando cosecha...");
+            DatabaseHelper.cargarCosechaEjemplo(new DatabaseHelper.OnCosechaLoadedListener() {
+                @Override
+                public void onSuccess() {
+                    if (isAdded()) {
+                        btnCargarCosechaEjemplo.setEnabled(true);
+                        btnCargarCosechaEjemplo.setText("Cargar cosecha de ejemplo");
+                        Mensajes.mostrarExito(btnCargarCosechaEjemplo, "Cosecha de ejemplo creada con éxito");
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    if (isAdded()) {
+                        btnCargarCosechaEjemplo.setEnabled(true);
+                        btnCargarCosechaEjemplo.setText("Cargar cosecha de ejemplo");
+                        Log.e("CARGA_DATOS", "Error al cargar cosecha: " + e.getMessage(), e);
+                        Mensajes.mostrarError(btnCargarCosechaEjemplo, e.getMessage());
+                    }
+                }
+            });
+        });
+
         btnLogout.setOnClickListener(v -> {
             mAuth.signOut();
             SessionManager.setEsInvitado(false);
@@ -215,7 +241,6 @@ public class CuentaFragment extends Fragment {
 
                                 tvUserName.setText(name + " " + surname);
                                 tvUserEmail.setText(usuario.getEmail());
-                                tvUserRole.setText("Rol: " + usuario.getRol());
 
                                 // Check if role is administrador (evaluated after reading user document)
                                 if ("administrador".equalsIgnoreCase(usuario.getRol())) {
@@ -248,7 +273,7 @@ public class CuentaFragment extends Fragment {
                                 tvUserInitials.setText(initials);
                             }
                         } else {
-                            tvUserName.setText("No se encontró información del usuario.");
+                            tvUserName.setText("No se encontró información del usuario প্রজাতির.");
                         }
                     })
                     .addOnFailureListener(e -> {
