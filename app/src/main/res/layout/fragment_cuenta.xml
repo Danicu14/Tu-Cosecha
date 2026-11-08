@@ -173,25 +173,61 @@
                 app:cornerRadius="16dp"
                 android:layout_marginTop="24dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCargarEjemplo"
+            <!-- Admin Tools Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAdminTools"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Cargar datos de ejemplo"
-                android:textSize="16sp"
-                app:cornerRadius="16dp"
-                android:visibility="gone"
-                android:layout_marginTop="12dp" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp"
+                android:visibility="gone">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCargarNoticiasEjemplo"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Cargar noticias de ejemplo"
-                android:textSize="16sp"
-                app:cornerRadius="16dp"
-                android:visibility="gone"
-                android:layout_marginTop="12dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Herramientas de administrador"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary"
+                        android:layout_marginBottom="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCargarEjemplo"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:text="Cargar datos de ejemplo"
+                        android:textSize="14sp"
+                        app:cornerRadius="12dp"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCargarNoticiasEjemplo"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:text="Cargar noticias de ejemplo"
+                        android:textSize="14sp"
+                        app:cornerRadius="12dp"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCargarPlanesEjemplo"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:text="Cargar planes de ejemplo"
+                        android:textSize="14sp"
+                        app:cornerRadius="12dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
@@ -203,7 +239,7 @@
                 app:cornerRadius="16dp"
                 app:strokeColor="@color/rojo_tomate"
                 android:textColor="@color/rojo_tomate"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp" />
 
         </LinearLayout>

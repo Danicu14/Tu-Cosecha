@@ -3,11 +3,15 @@ package com.danielcarpio.tucosecha.db;
 import android.util.Log;
 
 import com.danielcarpio.tucosecha.model.Cultivo;
+import com.danielcarpio.tucosecha.model.Plan;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DatabaseHelper {
 
@@ -17,6 +21,11 @@ public class DatabaseHelper {
     }
 
     public interface OnNoticiasLoadedListener {
+        void onSuccess(int count);
+        void onError(Exception e);
+    }
+
+    public interface OnPlanesLoadedListener {
         void onSuccess(int count);
         void onError(Exception e);
     }
@@ -34,7 +43,7 @@ public class DatabaseHelper {
         sampleCultivos.add(new Cultivo("", "Brócoli", "brocoli", "listo", 100, "hortaliza", "15/09/2026", "22/02/2027", "Rico en nutrientes y antioxidantes, cosechado en su punto óptimo de madurez."));
         sampleCultivos.add(new Cultivo("", "Ajo", "ajo", "creciendo", 60, "hortaliza", "01/12/2026", "25/05/2027", "Cabezas robustas desarrollándose lentamente bajo el sol manchego."));
         sampleCultivos.add(new Cultivo("", "Cebolla morada", "cebolla_morada", "creciendo", 70, "hortaliza", "20/11/2026", "30/03/2027", "Dulce y crujiente, ideal para ensaladas frescas y guisos selectos."));
-        sampleCultivos.add(new Cultivo("", "Tomate", "tomate", "sembrado", 10, "hortaliza", "15/01/2027", "15/06/2027", "La estrella de nuestra huerta, creciendo con el auténtico sabor tradicional."));
+        sampleCultivos.add(new Cultivo("", "Tomate", "tomate", "sembrado", 10, "hortaliza", "15/01/2027", "15/06/2027", "La estrella de nossa huerta, creciendo con el auténtico sabor tradicional."));
         sampleCultivos.add(new Cultivo("", "Pimiento", "pimiento", "sembrado", 8, "hortaliza", "20/01/2027", "20/06/2027", "Plantones jóvenes desarrollándose con fuerza para dar frutos coloridos y jugosos."));
         sampleCultivos.add(new Cultivo("", "Berenjena", "berenjena", "sembrado", 6, "hortaliza", "22/01/2027", "25/06/2027", "Cultivo de verano en pleno proceso de crecimiento bajo invernadero ecológico."));
         sampleCultivos.add(new Cultivo("", "Calabacín", "calabacin", "sembrado", 5, "hortaliza", "25/01/2027", "10/06/2027", "Tierno y versátil, ideal para cualquier receta saludable de temporada."));
@@ -77,18 +86,18 @@ public class DatabaseHelper {
             long currentTime = System.currentTimeMillis();
             long dayMillis = 24 * 60 * 60 * 1000L;
 
-            List<java.util.Map<String, Object>> sampleNoticias = new ArrayList<>();
+            List<Map<String, Object>> sampleNoticias = new ArrayList<>();
 
-            java.util.Map<String, Object> n1 = new java.util.HashMap<>();
+            Map<String, Object> n1 = new HashMap<>();
             n1.put("titulo", "Cosecha récord de acelgas y lechugas frescas");
             n1.put("resumen", "Esta semana hemos recolectado las mejores acelgas y lechugas crujientes de nuestra huerta talaverana.");
             n1.put("contenido", "Gracias a las recientes lluvias y al cuidado ecológico, nuestras acelgas y lechugas han alcanzado un tamaño y sabor extraordinarios. Ya están disponibles en las cestas de nuestros suscriptores para disfrutar en casa.");
             n1.put("categoria", "cosecha");
             n1.put("autor", "Administrador Tu Cosecha");
-            n1.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - 1 * dayMillis)));
+            n1.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - dayMillis)));
             sampleNoticias.add(n1);
 
-            java.util.Map<String, Object> n2 = new java.util.HashMap<>();
+            Map<String, Object> n2 = new HashMap<>();
             n2.put("titulo", "Sembrando los primeros tomates de temporada");
             n2.put("resumen", "Comenzamos la siembra de variedades tradicionales de tomate en nuestros invernaderos.");
             n2.put("contenido", "Ya hemos iniciado el trasplante de los semilleros de tomate. Este año apostamos por variedades autóctonas que garantizan un sabor inigualable para los meses de verano.");
@@ -97,7 +106,7 @@ public class DatabaseHelper {
             n2.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - 2 * dayMillis)));
             sampleNoticias.add(n2);
 
-            java.util.Map<String, Object> n3 = new java.util.HashMap<>();
+            Map<String, Object> n3 = new HashMap<>();
             n3.put("titulo", "Consejos clave para el riego eficiente en invierno");
             n3.put("resumen", "Cómo optimizar el agua de riego aprovechando la humedad ambiental de la vega del Tajo.");
             n3.put("contenido", "Durante los meses más fríos, las plantas requieren menor frecuencia de riego pero mayor profundidad. Te contamos las mejores prácticas para mantener tus cultivos sanos sin desperdiciar recursos hídricos.");
@@ -106,7 +115,7 @@ public class DatabaseHelper {
             n3.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - 3 * dayMillis)));
             sampleNoticias.add(n3);
 
-            java.util.Map<String, Object> n4 = new java.util.HashMap<>();
+            Map<String, Object> n4 = new HashMap<>();
             n4.put("titulo", "Aviso importante sobre horarios de recogida en el huerto");
             n4.put("resumen", "Actualización de los horarios de apertura y recogida de cestas para socios y suscriptores.");
             n4.put("contenido", "Recordamos a todos nuestros suscriptores que el horario de recogida en el punto de Talavera de la Reina es de lunes a viernes de 9:00 a 14:00 y de 17:00 a 19:00 horas. ¡Os esperamos!");
@@ -115,7 +124,7 @@ public class DatabaseHelper {
             n4.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - 4 * dayMillis)));
             sampleNoticias.add(n4);
 
-            java.util.Map<String, Object> n5 = new java.util.HashMap<>();
+            Map<String, Object> n5 = new HashMap<>();
             n5.put("titulo", "Nuevas variedades de frutos rojos en camino");
             n5.put("resumen", "Expandimos nuestra zona de frutales con frambuesas, moras y arándanos ecológicos.");
             n5.put("contenido", "Hemos preparado una nueva parcela dedicada exclusivamente a frutos rojos. Las primeras plantas ya están asentadas y esperamos una primera cata piloto para la próxima primavera.");
@@ -124,7 +133,7 @@ public class DatabaseHelper {
             n5.put("fecha", new com.google.firebase.Timestamp(new java.util.Date(currentTime - 5 * dayMillis)));
             sampleNoticias.add(n5);
 
-            java.util.Map<String, Object> n6 = new java.util.HashMap<>();
+            Map<String, Object> n6 = new HashMap<>();
             n6.put("titulo", "Preparando el compostaje orgánico sostenible");
             n6.put("resumen", "Transformamos los restos de poda y hortalizas en abono natural de primera calidad.");
             n6.put("contenido", "El ciclo del huerto es circular. Todos los restos orgánicos de cosechas anteriores son procesados en nuestra zona de compostaje para devolver los nutrientes esenciales directamente a la tierra.");
@@ -134,7 +143,7 @@ public class DatabaseHelper {
             sampleNoticias.add(n6);
 
             WriteBatch batch = db.batch();
-            for (java.util.Map<String, Object> n : sampleNoticias) {
+            for (Map<String, Object> n : sampleNoticias) {
                 com.google.firebase.firestore.DocumentReference docRef = db.collection("noticias").document();
                 batch.set(docRef, n);
             }
@@ -148,6 +157,42 @@ public class DatabaseHelper {
 
         }).addOnFailureListener(e -> {
             Log.e("CARGA_DATOS", "Error al verificar noticias: " + e.getMessage(), e);
+            listener.onError(e);
+        });
+    }
+
+    public static void cargarPlanesEjemplo(OnPlanesLoadedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("planes").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!queryDocumentSnapshots.isEmpty()) {
+                listener.onSuccess(0);
+                return;
+            }
+
+            WriteBatch batch = db.batch();
+
+            Plan basico = new Plan("basico", "Plan Básico", "Ideal para 1-2 personas. Cesta semanal de hortalizas de temporada.", 39.0, "1 persona", 5, false,
+                    Arrays.asList("Hortalizas frescas de temporada", "Recogida semanal en punto asignado", "Recetario exclusivo digital"));
+            batch.set(db.collection("planes").document("basico"), basico);
+
+            Plan familiar = new Plan("familiar", "Plan Familiar", "Perfecto para familias. Gran variedad de verduras y frutas frescas.", 69.0, "3-4 personas", 8, false,
+                    Arrays.asList("Verduras y frutas de temporada", "Doble ración de productos estrella", "Prioridad en elección de entrega"));
+            batch.set(db.collection("planes").document("familiar"), familiar);
+
+            Plan premium = new Plan("premium", "Plan Premium", "Máxima variedad, productos ecológicos extra y visitas guiadas al huerto.", 99.0, "3-4 personas", 12, true,
+                    Arrays.asList("Máxima variedad y productos ecológicos extra", "Prioridad absoluta en productos escasos", "Visitas guiadas y talleres en el huerto"));
+            batch.set(db.collection("planes").document("premium"), premium);
+
+            batch.commit()
+                    .addOnSuccessListener(aVoid -> listener.onSuccess(3))
+                    .addOnFailureListener(e -> {
+                        Log.e("CARGA_DATOS", "Error al cargar planes: " + e.getMessage(), e);
+                        listener.onError(e);
+                    });
+
+        }).addOnFailureListener(e -> {
+            Log.e("CARGA_DATOS", "Error al verificar planes: " + e.getMessage(), e);
             listener.onError(e);
         });
     }

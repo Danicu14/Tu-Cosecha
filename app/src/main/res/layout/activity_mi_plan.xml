@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/colorSurface"
+    android:fitsSystemWindows="true">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarMiPlan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:navigationIcon="@android:drawable/ic_menu_revert"
+        app:title="Mi Plan Actual"
+        app:titleTextColor="?attr/colorPrimary" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/tvMiPlanNombre"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/tvMiPlanPrecio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
+                        android:layout_marginTop="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvMiPlanProductos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginTop="12dp" />
+
+                    <TextView
+                        android:id="@+id/tvMiPlanFecha"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginTop="6dp" />
+
+                    <TextView
+                        android:id="@+id/tvMiPlanEstado"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#3E8E2F"
+                        android:layout_marginTop="6dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCambiarPlan"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Cambiar de plan"
+                android:textSize="16sp"
+                app:cornerRadius="16dp"
+                android:layout_marginTop="24dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelarSuscripcion"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Cancelar suscripción"
+                android:textSize="16sp"
+                app:cornerRadius="16dp"
+                app:strokeColor="@color/rojo_tomate"
+                android:textColor="@color/rojo_tomate"
+                android:layout_marginTop="12dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

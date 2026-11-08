@@ -23,6 +23,7 @@ import com.danielcarpio.tucosecha.model.Usuario;
 import com.danielcarpio.tucosecha.util.Mensajes;
 import com.danielcarpio.tucosecha.util.SessionManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,7 +34,8 @@ public class CuentaFragment extends Fragment {
     private LinearLayout layoutGuestAccount, layoutLoggedAccount;
     private TextView tvUserName, tvUserEmail, tvUserRole, tvUserInitials;
     private Chip chipPlan;
-    private MaterialButton btnLogout, btnMyPlan, btnCargarEjemplo, btnCargarNoticiasEjemplo, btnLoginFromAccount, btnRegisterFromAccount;
+    private MaterialButton btnLogout, btnMyPlan, btnCargarEjemplo, btnCargarNoticiasEjemplo, btnCargarPlanesEjemplo, btnLoginFromAccount, btnRegisterFromAccount;
+    private MaterialCardView cardAdminTools;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
@@ -56,6 +58,8 @@ public class CuentaFragment extends Fragment {
         btnMyPlan = view.findViewById(R.id.btnMyPlan);
         btnCargarEjemplo = view.findViewById(R.id.btnCargarEjemplo);
         btnCargarNoticiasEjemplo = view.findViewById(R.id.btnCargarNoticiasEjemplo);
+        btnCargarPlanesEjemplo = view.findViewById(R.id.btnCargarPlanesEjemplo);
+        cardAdminTools = view.findViewById(R.id.cardAdminTools);
         btnLoginFromAccount = view.findViewById(R.id.btnLoginFromAccount);
         btnRegisterFromAccount = view.findViewById(R.id.btnRegisterFromAccount);
 
@@ -139,6 +143,35 @@ public class CuentaFragment extends Fragment {
             });
         });
 
+        btnCargarPlanesEjemplo.setOnClickListener(v -> {
+            btnCargarPlanesEjemplo.setEnabled(false);
+            btnCargarPlanesEjemplo.setText("Cargando planes...");
+            DatabaseHelper.cargarPlanesEjemplo(new DatabaseHelper.OnPlanesLoadedListener() {
+                @Override
+                public void onSuccess(int count) {
+                    if (isAdded()) {
+                        btnCargarPlanesEjemplo.setEnabled(true);
+                        btnCargarPlanesEjemplo.setText("Cargar planes de ejemplo");
+                        if (count > 0) {
+                            Mensajes.mostrarExito(btnCargarPlanesEjemplo, count + " planes cargados");
+                        } else {
+                            Mensajes.mostrarInfo(btnCargarPlanesEjemplo, "La colección de planes ya tiene datos.");
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    if (isAdded()) {
+                        btnCargarPlanesEjemplo.setEnabled(true);
+                        btnCargarPlanesEjemplo.setText("Cargar planes de ejemplo");
+                        Log.e("CARGA_DATOS", "Error al cargar planes: " + e.getMessage(), e);
+                        Mensajes.mostrarError(btnCargarPlanesEjemplo, e.getMessage());
+                    }
+                }
+            });
+        });
+
         btnLogout.setOnClickListener(v -> {
             mAuth.signOut();
             SessionManager.setEsInvitado(false);
@@ -186,11 +219,9 @@ public class CuentaFragment extends Fragment {
 
                                 // Check if role is administrador (evaluated after reading user document)
                                 if ("administrador".equalsIgnoreCase(usuario.getRol())) {
-                                    btnCargarEjemplo.setVisibility(View.VISIBLE);
-                                    btnCargarNoticiasEjemplo.setVisibility(View.VISIBLE);
+                                    cardAdminTools.setVisibility(View.VISIBLE);
                                 } else {
-                                    btnCargarEjemplo.setVisibility(View.GONE);
-                                    btnCargarNoticiasEjemplo.setVisibility(View.GONE);
+                                    cardAdminTools.setVisibility(View.GONE);
                                 }
 
                                 String plan = usuario.getPlan() != null ? usuario.getPlan() : "ninguno";

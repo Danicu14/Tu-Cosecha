@@ -158,22 +158,68 @@
 
         </LinearLayout>
 
-        <!-- Logged View -->
+        <!-- Logged No Plan View (Shows RecyclerView of plans) -->
         <LinearLayout
-            android:id="@+id/layoutLoggedView"
+            android:id="@+id/layoutLoggedNoPlan"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Elige tu plan de suscripción"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimary"
+                android:gravity="center"
+                android:layout_marginBottom="16dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPlanes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+        </LinearLayout>
+
+        <!-- Logged Active Plan View -->
+        <LinearLayout
+            android:id="@+id/layoutLoggedActivePlan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:visibility="visible">
+            android:visibility="gone"
+            android:paddingTop="32dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cesta de la Compra"
-                android:textSize="20sp"
+                android:text="¡Ya tienes una suscripción activa!"
+                android:textSize="22sp"
                 android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="?attr/colorPrimary"
+                android:gravity="center"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Puedes gestionar tu plan y ver los detalles desde tu sección de cuenta."
+                android:textSize="15sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:gravity="center"
+                android:layout_marginBottom="24dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVerMiPlan"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Ver mi plan"
+                android:textSize="16sp"
+                app:cornerRadius="16dp" />
 
         </LinearLayout>
 
