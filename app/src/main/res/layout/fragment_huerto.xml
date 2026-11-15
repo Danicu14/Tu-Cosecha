@@ -9,7 +9,7 @@
         android:id="@+id/tvHeader"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="El huerto de Tú Cosecha · Talavera de la Reina"
+        android:text="El huerto de Tu Cosecha · Talavera de la Reina"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="?attr/colorPrimary"

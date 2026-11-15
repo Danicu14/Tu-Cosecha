@@ -19,8 +19,8 @@ import com.danielcarpio.tucosecha.LoginActivity;
 import com.danielcarpio.tucosecha.MiPlanActivity;
 import com.danielcarpio.tucosecha.R;
 import com.danielcarpio.tucosecha.RegistroActivity;
-import com.danielcarpio.tucosecha.db.DatabaseHelper;
 import com.danielcarpio.tucosecha.model.Usuario;
+import com.danielcarpio.tucosecha.util.DatosEjemplo;
 import com.danielcarpio.tucosecha.util.Mensajes;
 import com.danielcarpio.tucosecha.util.SessionManager;
 import com.google.android.material.button.MaterialButton;
@@ -94,7 +94,7 @@ public class CuentaFragment extends Fragment {
         btnCargarEjemplo.setOnClickListener(v -> {
             btnCargarEjemplo.setEnabled(false);
             btnCargarEjemplo.setText("Cargando datos...");
-            DatabaseHelper.cargarDatosEjemplo(new DatabaseHelper.OnDataLoadedListener() {
+            DatosEjemplo.cargarDatosEjemplo(new DatosEjemplo.OnDataLoadedListener() {
                 @Override
                 public void onSuccess(int count) {
                     if (isAdded()) {
@@ -119,7 +119,7 @@ public class CuentaFragment extends Fragment {
         btnCargarNoticiasEjemplo.setOnClickListener(v -> {
             btnCargarNoticiasEjemplo.setEnabled(false);
             btnCargarNoticiasEjemplo.setText("Cargando noticias...");
-            DatabaseHelper.cargarNoticiasEjemplo(new DatabaseHelper.OnNoticiasLoadedListener() {
+            DatosEjemplo.cargarNoticiasEjemplo(new DatosEjemplo.OnNoticiasLoadedListener() {
                 @Override
                 public void onSuccess(int count) {
                     if (isAdded()) {
@@ -148,7 +148,7 @@ public class CuentaFragment extends Fragment {
         btnCargarPlanesEjemplo.setOnClickListener(v -> {
             btnCargarPlanesEjemplo.setEnabled(false);
             btnCargarPlanesEjemplo.setText("Cargando planes...");
-            DatabaseHelper.cargarPlanesEjemplo(new DatabaseHelper.OnPlanesLoadedListener() {
+            DatosEjemplo.cargarPlanesEjemplo(new DatosEjemplo.OnPlanesLoadedListener() {
                 @Override
                 public void onSuccess(int count) {
                     if (isAdded()) {
@@ -177,7 +177,7 @@ public class CuentaFragment extends Fragment {
         btnCargarCosechaEjemplo.setOnClickListener(v -> {
             btnCargarCosechaEjemplo.setEnabled(false);
             btnCargarCosechaEjemplo.setText("Cargando cosecha...");
-            DatabaseHelper.cargarCosechaEjemplo(new DatabaseHelper.OnCosechaLoadedListener() {
+            DatosEjemplo.cargarCosechaEjemplo(new DatosEjemplo.OnCosechaLoadedListener() {
                 @Override
                 public void onSuccess() {
                     if (isAdded()) {
@@ -201,6 +201,7 @@ public class CuentaFragment extends Fragment {
 
         btnLogout.setOnClickListener(v -> {
             mAuth.signOut();
+            SessionManager.isEsInvitado();
             SessionManager.setEsInvitado(false);
             Intent intent = new Intent(getActivity(), LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -274,7 +275,7 @@ public class CuentaFragment extends Fragment {
                                 tvUserInitials.setText(initials);
                             }
                         } else {
-                            tvUserName.setText("No se encontró información del usuario প্রজাতির.");
+                            tvUserName.setText("No se encontró información del usuario.");
                         }
                     })
                     .addOnFailureListener(e -> {

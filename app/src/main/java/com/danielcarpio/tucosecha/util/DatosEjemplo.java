@@ -1,10 +1,11 @@
-package com.danielcarpio.tucosecha.db;
+package com.danielcarpio.tucosecha.util;
 
 import android.util.Log;
 
 import com.danielcarpio.tucosecha.model.Cultivo;
 import com.danielcarpio.tucosecha.model.Plan;
 import com.danielcarpio.tucosecha.model.ProductoCosecha;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class DatabaseHelper {
+public class DatosEjemplo {
 
     public interface OnDataLoadedListener {
         void onSuccess(int count);
@@ -44,7 +45,6 @@ public class DatabaseHelper {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         List<Cultivo> sampleCultivos = new ArrayList<>();
-        // Hortalizas (Ajo and Cebolla morada updated to listo, 100, without precio)
         sampleCultivos.add(new Cultivo("", "Acelga", "acelga", "listo", 100, "hortaliza", "01/11/2026", "10/02/2027", "Hojas verdes y carnosas de excelente calidad, ideales para sopas y revueltos frescos.", "1 manojo", Arrays.asList("Temporada", "Ecológico"), "hoja"));
         sampleCultivos.add(new Cultivo("", "Lechuga", "lechuga", "listo", 100, "hortaliza", "15/11/2026", "12/02/2027", "Crujiente y refrescante, cultivada con mimo en nuestra huerta de Talavera.", "1 ud", Arrays.asList("Temporada", "Km 0"), "hoja"));
         sampleCultivos.add(new Cultivo("", "Zanahoria", "zanahoria", "listo", 100, "hortaliza", "01/10/2026", "15/02/2027", "Raíz dulce y crujiente, rica en betacarotenos y sabor natural inigualable.", "1 kg", Arrays.asList("Temporada", "Ecológico", "Km 0"), "raíz"));
@@ -230,15 +230,28 @@ public class DatabaseHelper {
         cosechaMap.put("semana", "Semana actual en curso");
         cosechaMap.put("fechaRecogida", fechaRecogida);
         cosechaMap.put("horaRecogida", "10:00 a 13:00");
-        cosechaMap.put("lugarRecogida", "Huerto Tú Cosecha, vega del Tajo, Talavera de la Reina");
+        cosechaMap.put("lugarRecogida", "Huerto Tu Cosecha, vega del Tajo, Talavera de la Reina");
         cosechaMap.put("activa", true);
         cosechaMap.put("productos", productos);
 
-        db.collection("cosechas").add(cosechaMap)
-                .addOnSuccessListener(aVoid -> listener.onSuccess())
-                .addOnFailureListener(e -> {
-                    Log.e("CARGA_DATOS", "Error al cargar cosecha: " + e.getMessage(), e);
-                    listener.onError(e);
-                });
+        db.collection("cosechas").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            WriteBatch batch = db.batch();
+            for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                batch.update(doc.getReference(), "activa", false);
+            }
+
+            com.google.firebase.firestore.DocumentReference newDocRef = db.collection("cosechas").document();
+            batch.set(newDocRef, cosechaMap);
+
+            batch.commit()
+                    .addOnSuccessListener(aVoid -> listener.onSuccess())
+                    .addOnFailureListener(e -> {
+                        Log.e("CARGA_DATOS", "Error al cargar cosecha: " + e.getMessage(), e);
+                        listener.onError(e);
+                    });
+        }).addOnFailureListener(e -> {
+            Log.e("CARGA_DATOS", "Error al desactivar cosechas anteriores: " + e.getMessage(), e);
+            listener.onError(e);
+        });
     }
 }
