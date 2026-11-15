@@ -37,8 +37,10 @@ public class CuentaFragment extends Fragment {
     private TextView tvUserName, tvUserEmail, tvUserInitials;
     private Chip chipPlan;
     private MaterialButton btnLogout, btnCargarEjemplo, btnCargarNoticiasEjemplo, btnCargarPlanesEjemplo, btnCargarCosechaEjemplo, btnLoginFromAccount, btnRegisterFromAccount;
-    private View btnMyPlan, btnMisDatos, btnMisPedidos;
-    private MaterialCardView cardAdminTools;
+    private View btnMyPlan, btnMisDatos, btnMisPedidos, btnOptionPedidosAdmin;
+    private MaterialCardView cardAdminTools, cardPanelHortelano, cardOptionPedidosAdmin;
+    private TextView tvBadgeCancelaciones;
+    private com.google.firebase.firestore.ListenerRegistration cancelacionesListener;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
@@ -65,6 +67,10 @@ public class CuentaFragment extends Fragment {
         btnCargarPlanesEjemplo = view.findViewById(R.id.btnCargarPlanesEjemplo);
         btnCargarCosechaEjemplo = view.findViewById(R.id.btnCargarCosechaEjemplo);
         cardAdminTools = view.findViewById(R.id.cardAdminTools);
+        cardPanelHortelano = view.findViewById(R.id.cardPanelHortelano);
+        cardOptionPedidosAdmin = view.findViewById(R.id.cardOptionPedidosAdmin);
+        btnOptionPedidosAdmin = view.findViewById(R.id.btnOptionPedidosAdmin);
+        tvBadgeCancelaciones = view.findViewById(R.id.tvBadgeCancelaciones);
         btnLoginFromAccount = view.findViewById(R.id.btnLoginFromAccount);
         btnRegisterFromAccount = view.findViewById(R.id.btnRegisterFromAccount);
 
@@ -109,6 +115,24 @@ public class CuentaFragment extends Fragment {
                 startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.MisPedidosActivity.class));
             }
         });
+
+        View cardOptionMiPlan = view.findViewById(R.id.cardOptionMiPlan);
+        if (cardOptionMiPlan != null) cardOptionMiPlan.setOnClickListener(v -> btnMyPlan.performClick());
+
+        View cardOptionMisDatos = view.findViewById(R.id.cardOptionMisDatos);
+        if (cardOptionMisDatos != null) cardOptionMisDatos.setOnClickListener(v -> btnMisDatos.performClick());
+
+        View cardOptionMisPedidos = view.findViewById(R.id.cardOptionMisPedidos);
+        if (cardOptionMisPedidos != null) cardOptionMisPedidos.setOnClickListener(v -> btnMisPedidos.performClick());
+
+        if (btnOptionPedidosAdmin != null) {
+            btnOptionPedidosAdmin.setOnClickListener(v -> startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.PedidosAdminActivity.class)));
+        }
+        if (cardOptionPedidosAdmin != null) {
+            cardOptionPedidosAdmin.setOnClickListener(v -> {
+                if (btnOptionPedidosAdmin != null) btnOptionPedidosAdmin.performClick();
+            });
+        }
 
         btnCargarEjemplo.setOnClickListener(v -> {
             btnCargarEjemplo.setEnabled(false);
@@ -266,8 +290,12 @@ public class CuentaFragment extends Fragment {
                                 // Check if role is administrador (evaluated after reading user document)
                                 if ("administrador".equalsIgnoreCase(usuario.getRol())) {
                                     cardAdminTools.setVisibility(View.VISIBLE);
+                                    if (cardPanelHortelano != null) cardPanelHortelano.setVisibility(View.VISIBLE);
+                                    listenCancellationRequests();
                                 } else {
                                     cardAdminTools.setVisibility(View.GONE);
+                                    if (cardPanelHortelano != null) cardPanelHortelano.setVisibility(View.GONE);
+                                    stopCancellationListener();
                                 }
 
                                 String plan = usuario.getPlan() != null ? usuario.getPlan() : "ninguno";
@@ -302,6 +330,37 @@ public class CuentaFragment extends Fragment {
                         Mensajes.mostrarError(tvUserName, "Error al cargar datos: " + e.getMessage());
                     });
         }
+    }
+
+    private void listenCancellationRequests() {
+        if (cancelacionesListener != null) cancelacionesListener.remove();
+        cancelacionesListener = db.collection("pedidos")
+                .whereEqualTo("estado", com.danielcarpio.tucosecha.util.EstadoPedido.CANCELACION_SOLICITADA)
+                .addSnapshotListener((value, error) -> {
+                    if (!isAdded()) return;
+                    if (value != null && tvBadgeCancelaciones != null) {
+                        int count = value.size();
+                        if (count > 0) {
+                            tvBadgeCancelaciones.setText(String.valueOf(count));
+                            tvBadgeCancelaciones.setVisibility(View.VISIBLE);
+                        } else {
+                            tvBadgeCancelaciones.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+
+    private void stopCancellationListener() {
+        if (cancelacionesListener != null) {
+            cancelacionesListener.remove();
+            cancelacionesListener = null;
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        stopCancellationListener();
     }
 
     @Override

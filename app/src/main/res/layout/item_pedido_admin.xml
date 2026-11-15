@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="#E4EAD8"
+    app:cardBackgroundColor="?attr/colorSurface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header: Cliente & Estado -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+
+            <TextView
+                android:id="@+id/tvAdminPedidoCliente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nombre Cliente"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimary" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAdminPedidoEstado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirmado"
+                android:textSize="12sp"
+                app:chipMinHeight="28dp"
+                app:chipStrokeWidth="0dp" />
+
+        </LinearLayout>
+
+        <!-- Plan -->
+        <TextView
+            android:id="@+id/tvAdminPedidoPlan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Plan Familiar"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Metodo y direccion -->
+        <TextView
+            android:id="@+id/tvAdminPedidoMetodoYDireccion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Envío a domicilio: Calle Ejemplo 1\nTeléfono: 600123456"
+            android:textSize="14sp"
+            android:textColor="?attr/colorOnSurface"
+            android:layout_marginBottom="6dp" />
+
+        <!-- Indicaciones (optional) -->
+        <TextView
+            android:id="@+id/tvAdminPedidoIndicaciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Indicaciones: Dejar en portería"
+            android:textSize="13sp"
+            android:textStyle="italic"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone" />
+
+        <!-- Productos List Text -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Productos:"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimary"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvAdminPedidoProductos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• 2 kg Tomate\n• 1 ud Lechuga"
+            android:textSize="13sp"
+            android:textColor="?attr/colorOnSurface"
+            android:lineSpacingExtra="3dp"
+            android:layout_marginBottom="14dp" />
+
+        <!-- Cancelacion Alert & Buttons -->
+        <LinearLayout
+            android:id="@+id/layoutAdminCancelacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFE0B2"
+            android:padding="12dp"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cancelación solicitada por el cliente"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#E65100" />
+
+            <TextView
+                android:id="@+id/tvAdminMotivoCancelacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Motivo: ..."
+                android:textSize="13sp"
+                android:textColor="#BF360C"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAdminAceptarCancelacion"
+                    style="@style/Widget.TuCosecha.Button.Destructive"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="Aceptar cancelación"
+                    android:textSize="13sp"
+                    android:layout_marginEnd="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAdminRechazarCancelacion"
+                    style="@style/Widget.TuCosecha.Button.Tonal"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="Rechazar"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Primary State Action Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAdminAccionEstado"
+            style="@style/Widget.TuCosecha.Button"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Empezar a preparar"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

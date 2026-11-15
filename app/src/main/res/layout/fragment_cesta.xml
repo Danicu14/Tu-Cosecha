@@ -75,9 +75,70 @@
         </ScrollView>
     </LinearLayout>
 
-    <!-- CONFIRMED STATE -->
+    <!-- STATE 1: PREPARANDO PROXIMA CESTA -->
+    <LinearLayout
+        android:id="@+id/layoutPreparingState"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="1dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#E4EAD8">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="28dp">
+
+                <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@drawable/ic_cesta"
+                    app:tint="?attr/colorPrimary"
+                    android:contentDescription="@string/app_name"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estamos preparando la próxima cesta"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorPrimary"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="El huerto está preparando los productos de la próxima cosecha."
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <!-- STATE 2: PEDIDO REALIZADO -->
     <ScrollView
-        android:id="@+id/layoutConfirmedState"
+        android:id="@+id/layoutOrderDoneState"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
@@ -93,7 +154,7 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Green Gradient Top Card -->
+            <!-- Short Green Gradient Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -111,92 +172,127 @@
                     android:padding="20dp">
 
                     <TextView
-                        android:id="@+id/tvConfirmedHeader"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Tu cesta está confirmada"
+                        android:text="¡Pedido realizado!"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#1F5A2A" />
 
                     <TextView
-                        android:id="@+id/tvConfirmedDetails"
+                        android:id="@+id/tvOrderDoneFechaFranja"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Detalles del método y fecha..."
+                        android:text="Entrega: ..."
                         android:textSize="14sp"
                         android:textColor="#2E7D32"
-                        android:layout_marginTop="8dp" />
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp" />
 
-                    <TextView
-                        android:id="@+id/tvConfirmedDays"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnVerMisPedidos"
+                        style="@style/Widget.TuCosecha.Button"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Faltan N días"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="#3E8E2F"
-                        android:layout_marginTop="12dp" />
+                        android:layout_height="52dp"
+                        android:text="Ver mis pedidos" />
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
+            <!-- Bloque "Tu próxima cesta" -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardProximaCesta"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Productos de tu pedido"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorPrimary"
-                android:layout_marginBottom="8dp" />
+                app:cardCornerRadius="20dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E4EAD8">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvConfirmedProducts"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:layout_marginBottom="20dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tu próxima cesta"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Podrás crear otra cesta cuando el huerto publique productos nuevos. Te avisaremos."
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginTop="6dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- STATE 4: PEDIDOS CERRADOS -->
+    <LinearLayout
+        android:id="@+id/layoutClosedOrdersState"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="1dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#E4EAD8">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center"
+                android:padding="28dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnModificarPedido"
-                    style="@style/Widget.TuCosecha.Button.Tonal"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:text="Modificar pedido"
-                    android:layout_marginBottom="12dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCancelarPedido"
-                    style="@style/Widget.TuCosecha.Button.Destructive"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:text="Cancelar pedido" />
+                <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@drawable/ic_cesta"
+                    app:tint="@color/naranja"
+                    android:contentDescription="@string/app_name"
+                    android:layout_marginBottom="16dp" />
 
                 <TextView
-                    android:id="@+id/tvClosedOrderTag"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pedido cerrado, lo estamos preparando"
+                    android:text="Los pedidos de esta semana están cerrados. La próxima cesta se abrirá cuando el huerto publique la nueva cosecha."
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:textColor="#D32F2F"
-                    android:gravity="center"
-                    android:background="#FFCDD2"
-                    android:padding="16dp"
-                    android:visibility="gone" />
+                    android:textColor="?attr/colorOnSurface"
+                    android:gravity="center" />
 
             </LinearLayout>
 
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-    </ScrollView>
+    </LinearLayout>
+
+
 
     <!-- Fixed Bottom Bar -->
     <LinearLayout

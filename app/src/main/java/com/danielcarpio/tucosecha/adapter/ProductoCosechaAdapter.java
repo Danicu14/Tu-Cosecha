@@ -55,7 +55,7 @@ public class ProductoCosechaAdapter extends RecyclerView.Adapter<ProductoCosecha
         if (userPlan.equals("ninguno") || userPlan.equals("invitado")) {
             holder.tvCantidad.setText(producto.getUnidad());
         } else {
-            holder.tvCantidad.setText(cantidad + " " + producto.getUnidad());
+            holder.tvCantidad.setText(com.danielcarpio.tucosecha.util.Formato.cantidad(cantidad, producto.getUnidad()));
         }
 
         if (producto.isEscaso()) {

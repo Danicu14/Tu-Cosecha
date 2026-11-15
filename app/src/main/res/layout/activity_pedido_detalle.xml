@@ -76,150 +76,194 @@
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Horizontal Progress Bar of 4 steps -->
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/layoutProgressSteps"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="?attr/colorSurfaceVariant"
-                android:padding="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E4EAD8"
                 android:layout_marginBottom="20dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Estado del pedido"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnSurface"
-                    android:layout_marginBottom="12dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:weightSum="4">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <!-- Step 1: Confirmado -->
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <View
-                            android:id="@+id/indicatorStep1"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:background="@drawable/bg_circle_avatar" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Confirmado"
-                            android:textSize="11sp"
-                            android:textColor="?attr/colorOnSurface"
-                            android:layout_marginTop="4dp"
-                            android:gravity="center" />
-                    </LinearLayout>
+                        android:text="Estado del pedido"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorPrimary"
+                        android:layout_marginBottom="16dp" />
 
-                    <!-- Step 2: Preparando -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <View
-                            android:id="@+id/indicatorStep2"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:background="@drawable/bg_circle_avatar" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Preparando"
-                            android:textSize="11sp"
-                            android:textColor="?attr/colorOnSurface"
-                            android:layout_marginTop="4dp"
-                            android:gravity="center" />
-                    </LinearLayout>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:weightSum="4">
 
-                    <!-- Step 3: En camino / Listo -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <View
-                            android:id="@+id/indicatorStep3"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:background="@drawable/bg_circle_avatar" />
-                        <TextView
-                            android:id="@+id/tvStep3Label"
-                            android:layout_width="wrap_content"
+                        <!-- Step 1: Confirmado -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="En camino"
-                            android:textSize="11sp"
-                            android:textColor="?attr/colorOnSurface"
-                            android:layout_marginTop="4dp"
-                            android:gravity="center" />
-                    </LinearLayout>
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+                            <ImageView
+                                android:id="@+id/imgStep1"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:padding="8dp"
+                                android:background="@drawable/bg_step_circle_active"
+                                android:src="@drawable/ic_step_confirmado"
+                                android:contentDescription="@string/app_name" />
+                            <TextView
+                                android:id="@+id/tvStep1Label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Confirmado"
+                                android:textSize="11sp"
+                                android:textColor="?attr/colorPrimary"
+                                android:layout_marginTop="6dp"
+                                android:gravity="center" />
+                        </LinearLayout>
 
-                    <!-- Step 4: Entregado -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <View
-                            android:id="@+id/indicatorStep4"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:background="@drawable/bg_circle_avatar" />
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <!-- Step 2: Preparando -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Entregado"
-                            android:textSize="11sp"
-                            android:textColor="?attr/colorOnSurface"
-                            android:layout_marginTop="4dp"
-                            android:gravity="center" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+                            <ImageView
+                                android:id="@+id/imgStep2"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:padding="8dp"
+                                android:background="@drawable/bg_step_circle_inactive"
+                                android:src="@drawable/ic_step_preparando"
+                                android:contentDescription="@string/app_name" />
+                            <TextView
+                                android:id="@+id/tvStep2Label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Preparando"
+                                android:textSize="11sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:layout_marginTop="6dp"
+                                android:gravity="center" />
+                        </LinearLayout>
+
+                        <!-- Step 3: En camino / Listo -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+                            <ImageView
+                                android:id="@+id/imgStep3"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:padding="8dp"
+                                android:background="@drawable/bg_step_circle_inactive"
+                                android:src="@drawable/ic_step_camino"
+                                android:contentDescription="@string/app_name" />
+                            <TextView
+                                android:id="@+id/tvStep3Label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="En camino"
+                                android:textSize="11sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:layout_marginTop="6dp"
+                                android:gravity="center" />
+                        </LinearLayout>
+
+                        <!-- Step 4: Entregado -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+                            <ImageView
+                                android:id="@+id/imgStep4"
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:padding="8dp"
+                                android:background="@drawable/bg_step_circle_inactive"
+                                android:src="@drawable/ic_step_entregado"
+                                android:contentDescription="@string/app_name" />
+                            <TextView
+                                android:id="@+id/tvStep4Label"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Entregado"
+                                android:textSize="11sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:layout_marginTop="6dp"
+                                android:gravity="center" />
+                        </LinearLayout>
+
                     </LinearLayout>
 
                 </LinearLayout>
 
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Warning Banners for Cancellation -->
-            <TextView
-                android:id="@+id/tvCancellationPendingWarning"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardCancellationPending"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Has solicitado cancelar este pedido. El huerto te responderá pronto."
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#E65100"
-                android:background="#FFE0B2"
-                android:padding="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="#FFE0B2"
+                app:strokeWidth="1dp"
+                app:strokeColor="#FFB74D"
                 android:layout_marginBottom="16dp"
-                android:visibility="gone" />
+                android:visibility="gone">
 
-            <TextView
-                android:id="@+id/tvCancellationRejectedWarning"
+                <TextView
+                    android:id="@+id/tvCancellationPendingWarning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Has solicitado cancelar este pedido. El huerto te responderá pronto."
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#E65100"
+                    android:padding="16dp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardCancellationRejected"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="El huerto no ha podido cancelar tu pedido."
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#B71C1C"
-                android:background="#FFCDD2"
-                android:padding="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="#FFCDD2"
+                app:strokeWidth="1dp"
+                app:strokeColor="#E57373"
                 android:layout_marginBottom="16dp"
-                android:visibility="gone" />
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvCancellationRejectedWarning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="El huerto no ha podido cancelar tu pedido"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#B71C1C"
+                    android:padding="16dp" />
+
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:layout_width="match_parent"
@@ -240,12 +284,10 @@
             <!-- Action Button: Solicitar cancelación -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSolicitarCancelacion"
-                style="@style/Widget.TuCosecha.Button.Outlined"
+                style="@style/Widget.TuCosecha.Button.Destructive"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:text="Solicitar cancelación"
-                android:textColor="@color/rojo_tomate"
-                app:strokeColor="@color/rojo_tomate" />
+                android:text="Solicitar cancelación" />
 
         </LinearLayout>
 

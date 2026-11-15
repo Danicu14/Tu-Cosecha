@@ -17,6 +17,18 @@ import com.danielcarpio.tucosecha.ui.fragments.CestaFragment;
 import com.danielcarpio.tucosecha.ui.fragments.CuentaFragment;
 import com.danielcarpio.tucosecha.ui.fragments.HuertoFragment;
 import com.danielcarpio.tucosecha.ui.fragments.NoticiasFragment;
+import com.danielcarpio.tucosecha.util.EstadoPedido;
+import com.danielcarpio.tucosecha.util.Mensajes;
+import com.danielcarpio.tucosecha.util.SessionManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -70,6 +82,104 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
+    }
+
+    private ListenerRegistration ordersNotificationListener;
+    private final Map<String, String> lastOrderStates = new HashMap<>();
+    private final Map<String, String> lastOrderCancelRespuesta = new HashMap<>();
+    private boolean isOrdersFirstLoad = true;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        startOrdersNotificationListener();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (ordersNotificationListener != null) {
+            ordersNotificationListener.remove();
+            ordersNotificationListener = null;
+        }
+    }
+
+    private void startOrdersNotificationListener() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null || SessionManager.isEsInvitado()) return;
+
+        if (ordersNotificationListener != null) ordersNotificationListener.remove();
+        isOrdersFirstLoad = true;
+        lastOrderStates.clear();
+        lastOrderCancelRespuesta.clear();
+
+        ordersNotificationListener = FirebaseFirestore.getInstance()
+                .collection("pedidos")
+                .whereEqualTo("uid", user.getUid())
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null || snapshots == null) return;
+
+                    if (isOrdersFirstLoad) {
+                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
+                            lastOrderStates.put(doc.getId(), doc.getString("estado"));
+                            Map<String, Object> cancel = (Map<String, Object>) doc.get("cancelacion");
+                            if (cancel != null && cancel.get("respuesta") != null) {
+                                lastOrderCancelRespuesta.put(doc.getId(), String.valueOf(cancel.get("respuesta")));
+                            }
+                        }
+                        isOrdersFirstLoad = false;
+                        return;
+                    }
+
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        if (dc.getType() == DocumentChange.Type.MODIFIED) {
+                            DocumentSnapshot doc = dc.getDocument();
+                            String docId = doc.getId();
+                            String newEstado = doc.getString("estado");
+                            String oldEstado = lastOrderStates.get(docId);
+
+                            Map<String, Object> cancel = (Map<String, Object>) doc.get("cancelacion");
+                            String newRespuesta = (cancel != null && cancel.get("respuesta") != null) ? String.valueOf(cancel.get("respuesta")) : null;
+                            String oldRespuesta = lastOrderCancelRespuesta.get(docId);
+
+                            View anchor = findViewById(R.id.main);
+                            if (anchor != null) {
+                                if (newEstado != null && !newEstado.equalsIgnoreCase(oldEstado)) {
+                                    if (EstadoPedido.CANCELADO.equalsIgnoreCase(newEstado)) {
+                                        if ("aceptada".equalsIgnoreCase(newRespuesta)) {
+                                            Mensajes.mostrarInfo(anchor, "Tu cancelación ha sido aceptada");
+                                        } else {
+                                            Mensajes.mostrarInfo(anchor, "Pedido cancelado");
+                                        }
+                                    } else if (EstadoPedido.EN_CAMINO.equalsIgnoreCase(newEstado)) {
+                                        Mensajes.mostrarInfo(anchor, "¡Tu pedido está en camino!");
+                                    } else if (EstadoPedido.LISTO_PARA_RECOGER.equalsIgnoreCase(newEstado)) {
+                                        Mensajes.mostrarInfo(anchor, "Tu cesta te espera en el huerto");
+                                    } else if (EstadoPedido.PREPARANDO.equalsIgnoreCase(newEstado)) {
+                                        Mensajes.mostrarInfo(anchor, "Estamos preparando tu cesta");
+                                    } else if (EstadoPedido.ENTREGADO.equalsIgnoreCase(newEstado)) {
+                                        Mensajes.mostrarInfo(anchor, "¡Cesta entregada! Que aproveche");
+                                    } else if (EstadoPedido.CANCELACION_SOLICITADA.equalsIgnoreCase(newEstado)) {
+                                        Mensajes.mostrarInfo(anchor, "Cancelación solicitada");
+                                    } else {
+                                        Mensajes.mostrarInfo(anchor, EstadoPedido.getMensajeEstado(newEstado));
+                                    }
+                                } else if (newRespuesta != null && !newRespuesta.equalsIgnoreCase(oldRespuesta)) {
+                                    if ("rechazada".equalsIgnoreCase(newRespuesta)) {
+                                        Mensajes.mostrarInfo(anchor, "El huerto no ha podido cancelar tu pedido");
+                                    } else if ("aceptada".equalsIgnoreCase(newRespuesta)) {
+                                        Mensajes.mostrarInfo(anchor, "Tu cancelación ha sido aceptada");
+                                    }
+                                }
+                            }
+
+                            lastOrderStates.put(docId, newEstado);
+                            if (newRespuesta != null) {
+                                lastOrderCancelRespuesta.put(docId, newRespuesta);
+                            }
+                        }
+                    }
+                });
     }
 
     @Override

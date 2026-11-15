@@ -21,7 +21,7 @@ public class EstadoPedido {
             case ENTREGADO:
                 return "¡Cesta entregada! Que aproveche";
             case CANCELACION_SOLICITADA:
-                return "Solicitud de cancelación en revisión";
+                return "Cancelación solicitada";
             case CANCELADO:
                 return "Pedido cancelado";
             case CONFIRMADO:

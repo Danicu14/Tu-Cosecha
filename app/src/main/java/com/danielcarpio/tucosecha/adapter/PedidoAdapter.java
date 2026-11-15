@@ -122,38 +122,38 @@ public class PedidoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         switch (estado) {
             case EstadoPedido.PREPARANDO:
                 text = "Preparando";
-                bgColor = Color.parseColor("#FFE0B2");
-                textColor = Color.parseColor("#E65100");
+                bgColor = Color.parseColor("#FFF8E1"); // ámbar
+                textColor = Color.parseColor("#FF8F00");
                 break;
             case EstadoPedido.EN_CAMINO:
                 text = "En camino";
-                bgColor = Color.parseColor("#BBDEFB");
-                textColor = Color.parseColor("#0D47A1");
+                bgColor = Color.parseColor("#E3F2FD"); // azul
+                textColor = Color.parseColor("#1565C0");
                 break;
             case EstadoPedido.LISTO_PARA_RECOGER:
                 text = "Listo para recoger";
-                bgColor = Color.parseColor("#BBDEFB");
-                textColor = Color.parseColor("#0D47A1");
+                bgColor = Color.parseColor("#E3F2FD"); // azul
+                textColor = Color.parseColor("#1565C0");
                 break;
             case EstadoPedido.ENTREGADO:
                 text = "Entregado";
-                bgColor = Color.parseColor("#A5D6A7");
-                textColor = Color.parseColor("#1B5E20");
+                bgColor = Color.parseColor("#CFD8DC"); // gris verdoso
+                textColor = Color.parseColor("#2E3E34");
                 break;
             case EstadoPedido.CANCELACION_SOLICITADA:
                 text = "Cancelación solicitada";
-                bgColor = Color.parseColor("#FFE0B2");
+                bgColor = Color.parseColor("#FFE0B2"); // naranja
                 textColor = Color.parseColor("#E65100");
                 break;
             case EstadoPedido.CANCELADO:
                 text = "Cancelado";
-                bgColor = Color.parseColor("#FFCDD2");
-                textColor = Color.parseColor("#B71C1C");
+                bgColor = Color.parseColor("#FFCDD2"); // rojo
+                textColor = Color.parseColor("#C62828");
                 break;
             case EstadoPedido.CONFIRMADO:
             default:
                 text = "Confirmado";
-                bgColor = Color.parseColor("#C8E6C9");
+                bgColor = Color.parseColor("#C8E6C9"); // verde
                 textColor = Color.parseColor("#1F5A2A");
                 break;
         }

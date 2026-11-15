@@ -50,17 +50,19 @@ import java.util.Map;
 
 public class CestaFragment extends Fragment {
 
-    private RecyclerView rvCestaCultivos, rvConfirmedProducts, rvThumbnails;
+    private RecyclerView rvCestaCultivos, rvThumbnails;
     private ProgressBar progressCestaLoading;
     private TextView tvCestaEmpty, tvCestaResumenVariedades, tvCestaResumenPlan, tvSubTitle;
     private MaterialButton btnCestaAction;
 
-    // Confirmed order UI views
-    private LinearLayout layoutDraftState;
-    private ScrollView layoutConfirmedState;
-    private TextView tvConfirmedHeader, tvConfirmedDetails, tvConfirmedDays;
-    private MaterialButton btnModificarPedido, btnCancelarPedido;
-    private TextView tvClosedOrderTag;
+    // State views
+    private View layoutDraftState;
+    private View layoutPreparingState;
+    private View layoutOrderDoneState;
+    private View layoutClosedOrdersState;
+    private View layoutBottomCestaBar;
+    private TextView tvOrderDoneFechaFranja;
+    private MaterialButton btnVerMisPedidos;
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
@@ -102,14 +104,12 @@ public class CestaFragment extends Fragment {
         tvSubTitle = view.findViewById(R.id.tvCestaSubTitle);
 
         layoutDraftState = view.findViewById(R.id.layoutDraftState);
-        layoutConfirmedState = view.findViewById(R.id.layoutConfirmedState);
-        tvConfirmedHeader = view.findViewById(R.id.tvConfirmedHeader);
-        tvConfirmedDetails = view.findViewById(R.id.tvConfirmedDetails);
-        tvConfirmedDays = view.findViewById(R.id.tvConfirmedDays);
-        btnModificarPedido = view.findViewById(R.id.btnModificarPedido);
-        btnCancelarPedido = view.findViewById(R.id.btnCancelarPedido);
-        tvClosedOrderTag = view.findViewById(R.id.tvClosedOrderTag);
-        rvConfirmedProducts = view.findViewById(R.id.rvConfirmedProducts);
+        layoutPreparingState = view.findViewById(R.id.layoutPreparingState);
+        layoutOrderDoneState = view.findViewById(R.id.layoutOrderDoneState);
+        layoutClosedOrdersState = view.findViewById(R.id.layoutClosedOrdersState);
+        layoutBottomCestaBar = view.findViewById(R.id.layoutBottomCestaBar);
+        tvOrderDoneFechaFranja = view.findViewById(R.id.tvOrderDoneFechaFranja);
+        btnVerMisPedidos = view.findViewById(R.id.btnVerMisPedidos);
         rvThumbnails = view.findViewById(R.id.rvThumbnails);
 
         rvCestaCultivos.setLayoutManager(new GridLayoutManager(getContext(), 2));
@@ -235,6 +235,12 @@ public class CestaFragment extends Fragment {
                     if (!isAdded()) return;
 
                     activeHarvestProducts.clear();
+                    activeHarvestId = null;
+                    activeHarvestSemana = null;
+                    activeHarvestLugar = null;
+                    activeHarvestFecha = null;
+                    activeHarvestHora = null;
+
                     if (value != null && !value.isEmpty()) {
                         for (QueryDocumentSnapshot doc : value) {
                             Cosecha cosecha = doc.toObject(Cosecha.class);
@@ -249,6 +255,22 @@ public class CestaFragment extends Fragment {
                                 activeHarvestProducts.addAll(cosecha.getProductos());
                             }
                             break;
+                        }
+                    }
+
+                    if (getContext() != null) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        String uid = user != null ? user.getUid() : "guest";
+                        SharedPreferences prefs = getContext().getSharedPreferences("tucosecha_prefs", Context.MODE_PRIVATE);
+                        String savedHarvestId = prefs.getString("last_harvest_id_" + uid, null);
+
+                        if (activeHarvestId != null) {
+                            if (savedHarvestId != null && !savedHarvestId.equals(activeHarvestId)) {
+                                // Harvest changed! Discard old draft and empty list
+                                prefs.edit().remove("draft_" + uid + "_" + savedHarvestId).apply();
+                                selectedCultivos.clear();
+                            }
+                            prefs.edit().putString("last_harvest_id_" + uid, activeHarvestId).apply();
                         }
                     }
 
@@ -268,135 +290,116 @@ public class CestaFragment extends Fragment {
 
                         if (documentSnapshot != null && documentSnapshot.exists()) {
                             confirmedPedido = documentSnapshot.toObject(Pedido.class);
-                            showConfirmedStateUI();
                         } else {
                             confirmedPedido = null;
-                            showDraftStateUI();
-                            loadDraftFromPreferences();
-                            loadCultivosCatalog();
                         }
+                        updateCestaUIState();
                     });
         } else {
-            showDraftStateUI();
-            loadDraftFromPreferences();
-            loadCultivosCatalog();
+            confirmedPedido = null;
+            updateCestaUIState();
         }
     }
 
-    private void showDraftStateUI() {
-        if (layoutDraftState != null) layoutDraftState.setVisibility(View.VISIBLE);
-        if (layoutConfirmedState != null) layoutConfirmedState.setVisibility(View.GONE);
-    }
-
-    private void showConfirmedStateUI() {
-        if (layoutDraftState != null) layoutDraftState.setVisibility(View.GONE);
-        if (layoutConfirmedState != null) layoutConfirmedState.setVisibility(View.VISIBLE);
+    private void updateCestaUIState() {
+        if (!isAdded()) return;
         progressCestaLoading.setVisibility(View.GONE);
 
-        if (confirmedPedido == null) return;
+        boolean isSubscriber = !userPlan.equalsIgnoreCase("ninguno") && !userPlan.equalsIgnoreCase("invitado");
 
-        tvConfirmedHeader.setText("Tu cesta está confirmada");
-        if ("domicilio".equalsIgnoreCase(confirmedPedido.getMetodoEntrega()) && confirmedPedido.getDireccion() != null) {
-            Map<String, Object> dir = confirmedPedido.getDireccion();
-            String calle = dir.get("calle") != null ? String.valueOf(dir.get("calle")) : "";
-            String loc = dir.get("localidad") != null ? String.valueOf(dir.get("localidad")) : "Talavera de la Reina";
-            tvConfirmedDetails.setText("Te la mandamos a: " + calle + ", " + loc + "\nFecha: " + confirmedPedido.getFechaEntrega() + " (" + confirmedPedido.getHoraEntrega() + ")");
-        } else {
-            tvConfirmedDetails.setText("Recógela en: " + (confirmedPedido.getLugarRecogida() != null ? confirmedPedido.getLugarRecogida() : "Huerto Tú Cosecha") + "\nFecha: " + confirmedPedido.getFechaEntrega() + " (" + confirmedPedido.getHoraEntrega() + ")");
+        if (!isSubscriber) {
+            layoutDraftState.setVisibility(View.VISIBLE);
+            layoutPreparingState.setVisibility(View.GONE);
+            layoutOrderDoneState.setVisibility(View.GONE);
+            layoutClosedOrdersState.setVisibility(View.GONE);
+            layoutBottomCestaBar.setVisibility(View.VISIBLE);
+            setupBottomBar();
+            loadCultivosCatalog();
+            return;
         }
 
-        // Calculate days remaining
-        int daysRemaining = calculateDaysRemaining(confirmedPedido.getFechaEntrega());
-        if (daysRemaining >= 0) {
-            tvConfirmedDays.setText("Faltan " + daysRemaining + " días");
-        } else {
-            tvConfirmedDays.setText("Fecha de entrega alcanzada");
+        int days = calculateDaysRemaining(activeHarvestFecha);
+        boolean orderExists = (confirmedPedido != null);
+        boolean isCancelled = orderExists && com.danielcarpio.tucosecha.util.EstadoPedido.CANCELADO.equalsIgnoreCase(confirmedPedido.getEstado());
+        boolean hasActiveOrder = orderExists && !isCancelled;
+
+        // 1. Sin cosecha activa, o con la fecha de entrega pasada y sin pedido:
+        // "Estamos preparando la próxima cesta".
+        if (activeHarvestId == null || (days < 0 && !hasActiveOrder)) {
+            layoutPreparingState.setVisibility(View.VISIBLE);
+            layoutOrderDoneState.setVisibility(View.GONE);
+            layoutDraftState.setVisibility(View.GONE);
+            layoutClosedOrdersState.setVisibility(View.GONE);
+            layoutBottomCestaBar.setVisibility(View.GONE);
+            return;
         }
 
-        if (daysRemaining > 2) {
-            btnModificarPedido.setVisibility(View.VISIBLE);
-            btnCancelarPedido.setVisibility(View.VISIBLE);
-            tvClosedOrderTag.setVisibility(View.GONE);
+        // 2. Con pedido de la cosecha activa cuyo estado NO sea "cancelado":
+        // tarjeta corta con degradado verde "¡Pedido realizado!", la fecha y franja de entrega y el botón primario "Ver mis pedidos" (abre Mis pedidos). Debajo, un bloque "Tu próxima cesta": "Podrás crear otra cesta cuando el huerto publique productos nuevos. Te avisaremos." NO muestres aquí la lista de productos del pedido ni la barra "Tu lista".
+        if (hasActiveOrder) {
+            layoutPreparingState.setVisibility(View.GONE);
+            layoutOrderDoneState.setVisibility(View.VISIBLE);
+            layoutDraftState.setVisibility(View.GONE);
+            layoutClosedOrdersState.setVisibility(View.GONE);
+            layoutBottomCestaBar.setVisibility(View.GONE);
 
-            btnModificarPedido.setOnClickListener(v -> modificarPedido());
-            btnCancelarPedido.setOnClickListener(v -> cancelarPedidoDialog());
-        } else {
-            btnModificarPedido.setVisibility(View.GONE);
-            btnCancelarPedido.setVisibility(View.GONE);
-            tvClosedOrderTag.setVisibility(View.VISIBLE);
+            String fechaStr = confirmedPedido.getFechaEntrega() != null ? confirmedPedido.getFechaEntrega().trim() : (activeHarvestFecha != null ? activeHarvestFecha.trim() : "-");
+            String horaStr = (confirmedPedido.getHoraEntrega() != null && !confirmedPedido.getHoraEntrega().trim().isEmpty()) ? " (" + confirmedPedido.getHoraEntrega().trim() + ")" : "";
+            tvOrderDoneFechaFranja.setText("Entrega: " + fechaStr + horaStr);
+
+            btnVerMisPedidos.setOnClickListener(v -> startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.MisPedidosActivity.class)));
+            return;
         }
 
-        // Products list in confirmed order
-        if (confirmedPedido.getProductos() != null) {
-            ConfirmedProductsAdapter pAdapter = new ConfirmedProductsAdapter(confirmedPedido.getProductos());
-            rvConfirmedProducts.setLayoutManager(new LinearLayoutManager(getContext()));
-            rvConfirmedProducts.setAdapter(pAdapter);
+        // 3. Sin pedido (o con pedido "cancelado") y faltando más de 2 días:
+        // modo selección (catálogo, lista, hoja de confirmación) como ahora. Al confirmar tras una cancelación, se reutiliza el mismo documento {idCosecha}_{uid} con set().
+        if (days > 2) {
+            layoutPreparingState.setVisibility(View.GONE);
+            layoutOrderDoneState.setVisibility(View.GONE);
+            layoutDraftState.setVisibility(View.VISIBLE);
+            layoutClosedOrdersState.setVisibility(View.GONE);
+            layoutBottomCestaBar.setVisibility(View.VISIBLE);
+
+            setupBottomBar();
+            loadDraftFromPreferences();
+            loadCultivosCatalog();
+            return;
         }
+
+        // 4. Sin pedido y faltando 2 días o menos:
+        // "Los pedidos de esta semana están cerrados. La próxima cesta se abrirá cuando el huerto publique la nueva cosecha."
+        layoutPreparingState.setVisibility(View.GONE);
+        layoutOrderDoneState.setVisibility(View.GONE);
+        layoutDraftState.setVisibility(View.GONE);
+        layoutClosedOrdersState.setVisibility(View.VISIBLE);
+        layoutBottomCestaBar.setVisibility(View.GONE);
     }
 
     private int calculateDaysRemaining(String fechaStr) {
+        if (fechaStr == null || fechaStr.trim().isEmpty()) return -1;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            Date deliveryDate = sdf.parse(fechaStr);
+            Date deliveryDate = sdf.parse(fechaStr.trim());
             if (deliveryDate != null) {
-                long diffMillis = deliveryDate.getTime() - System.currentTimeMillis();
-                long days = diffMillis / (1000 * 60 * 60 * 24);
-                return (int) Math.max(0, days);
+                java.util.Calendar calToday = java.util.Calendar.getInstance();
+                calToday.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                calToday.set(java.util.Calendar.MINUTE, 0);
+                calToday.set(java.util.Calendar.SECOND, 0);
+                calToday.set(java.util.Calendar.MILLISECOND, 0);
+
+                java.util.Calendar calDelivery = java.util.Calendar.getInstance();
+                calDelivery.setTime(deliveryDate);
+                calDelivery.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                calDelivery.set(java.util.Calendar.MINUTE, 0);
+                calDelivery.set(java.util.Calendar.SECOND, 0);
+                calDelivery.set(java.util.Calendar.MILLISECOND, 0);
+
+                long diffMillis = calDelivery.getTimeInMillis() - calToday.getTimeInMillis();
+                return (int) (diffMillis / (1000 * 60 * 60 * 24));
             }
-        } catch (Exception e) {
-            // ignore
+        } catch (Exception ignored) {
         }
-        return 3; // default > 2
-    }
-
-    private void modificarPedido() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null || activeHarvestId == null) return;
-        String orderId = activeHarvestId + "_" + user.getUid();
-
-        // Restore selected cultivos from confirmed order products
-        selectedCultivos.clear();
-        if (confirmedPedido.getProductos() != null) {
-            for (Map<String, Object> pMap : confirmedPedido.getProductos()) {
-                Cultivo c = new Cultivo();
-                c.setNombre(String.valueOf(pMap.get("nombre")));
-                c.setImagen(pMap.get("imagen") != null ? String.valueOf(pMap.get("imagen")) : "logo_tucosecha");
-                c.setUnidadVenta(pMap.get("unidad") != null ? String.valueOf(pMap.get("unidad")) : "kg");
-                selectedCultivos.add(c);
-            }
-        }
-        saveDraftToPreferences();
-
-        // Delete order in Firestore so user returns to draft state
-        db.collection("pedidos").document(orderId).delete()
-                .addOnSuccessListener(aVoid -> {
-                    Mensajes.mostrarInfo(btnModificarPedido, "Pedido abierto para modificación.");
-                    loadConfirmedOrder();
-                });
-    }
-
-    private void cancelarPedidoDialog() {
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Cancelar pedido")
-                .setMessage("¿Estás seguro de que deseas cancelar este pedido?")
-                .setPositiveButton("Sí, cancelar", (dialog, which) -> ejecutarCancelacionPedido())
-                .setNegativeButton("No", null)
-                .show();
-    }
-
-    private void ejecutarCancelacionPedido() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null || activeHarvestId == null) return;
-        String orderId = activeHarvestId + "_" + user.getUid();
-
-        db.collection("pedidos").document(orderId).delete()
-                .addOnSuccessListener(aVoid -> {
-                    clearDraftInPreferences();
-                    selectedCultivos.clear();
-                    Mensajes.mostrarExito(btnCancelarPedido, "Pedido cancelado correctamente.");
-                    loadConfirmedOrder();
-                })
-                .addOnFailureListener(e -> Mensajes.mostrarError(btnCancelarPedido, "Error al cancelar: " + e.getMessage()));
+        return -1;
     }
 
     private void loadCultivosCatalog() {
@@ -615,53 +618,7 @@ public class CestaFragment extends Fragment {
         }
     }
 
-    private static class ConfirmedProductsAdapter extends RecyclerView.Adapter<ConfirmedProductsAdapter.ViewHolder> {
-        private final List<Map<String, Object>> productos;
 
-        public ConfirmedProductsAdapter(List<Map<String, Object>> productos) {
-            this.productos = productos;
-        }
-
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_cesta_draft, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            Map<String, Object> p = productos.get(position);
-            holder.tvName.setText(String.valueOf(p.get("nombre")));
-            Object cant = p.get("cantidad");
-            Object unidad = p.get("unidad");
-            holder.tvQuantity.setText((cant != null ? cant.toString() : "1") + " " + (unidad != null ? unidad.toString() : "kg"));
-
-            int resId = holder.itemView.getContext().getResources().getIdentifier(p.get("imagen") != null ? String.valueOf(p.get("imagen")) : "logo_tucosecha", "drawable", holder.itemView.getContext().getPackageName());
-            if (resId == 0) resId = R.drawable.logo_tucosecha;
-            holder.imgPhoto.setImageResource(resId);
-            holder.btnRemove.setVisibility(View.GONE);
-        }
-
-        @Override
-        public int getItemCount() {
-            return productos.size();
-        }
-
-        static class ViewHolder extends RecyclerView.ViewHolder {
-            ImageView imgPhoto;
-            TextView tvName, tvQuantity;
-            MaterialButton btnRemove;
-
-            public ViewHolder(@NonNull View itemView) {
-                super(itemView);
-                imgPhoto = itemView.findViewById(R.id.imgDraftPhoto);
-                tvName = itemView.findViewById(R.id.tvDraftName);
-                tvQuantity = itemView.findViewById(R.id.tvDraftQuantity);
-                btnRemove = itemView.findViewById(R.id.btnRemoveDraftItem);
-            }
-        }
-    }
 
     private static class ThumbnailsAdapter extends RecyclerView.Adapter<ThumbnailsAdapter.ViewHolder> {
         private final List<Cultivo> thumbnails;

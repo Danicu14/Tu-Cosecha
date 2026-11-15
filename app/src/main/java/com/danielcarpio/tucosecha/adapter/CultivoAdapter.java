@@ -118,18 +118,22 @@ public class CultivoAdapter extends RecyclerView.Adapter<CultivoAdapter.CultivoV
                 holder.tvPrecio.setTextColor(Color.parseColor("#3E8E2F"));
             } else {
                 double qty = 0;
+                String harvestUnit = cultivo.getUnidadVenta();
                 if (harvestProducts != null) {
                     for (ProductoCosecha p : harvestProducts) {
                         if (p.getNombre().equalsIgnoreCase(cultivo.getNombre())) {
                             if (userPlan.contains("basico")) qty = p.getCantidadBasico();
                             else if (userPlan.contains("familiar")) qty = p.getCantidadFamiliar();
                             else if (userPlan.contains("premium")) qty = p.getCantidadPremium();
+                            if (p.getUnidad() != null && !p.getUnidad().trim().isEmpty()) {
+                                harvestUnit = p.getUnidad().trim();
+                            }
                             break;
                         }
                     }
                 }
                 if (qty > 0) {
-                    qtyText = (qty == (int) qty ? String.valueOf((int) qty) : String.valueOf(qty)) + " " + (cultivo.getUnidadVenta() != null ? cultivo.getUnidadVenta() : "ud");
+                    qtyText = com.danielcarpio.tucosecha.util.Formato.cantidad(qty, harvestUnit);
                 }
                 holder.tvPrecio.setTextColor(Color.parseColor("#1F5A2A"));
             }

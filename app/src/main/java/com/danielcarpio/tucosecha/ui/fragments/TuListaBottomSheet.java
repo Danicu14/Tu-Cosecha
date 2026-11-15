@@ -267,18 +267,22 @@ public class TuListaBottomSheet extends BottomSheetDialogFragment {
             pMap.put("nombre", c.getNombre());
             pMap.put("imagen", c.getImagen());
             double cant = 1.0;
+            String unidad = "ud";
             if (activeHarvestProducts != null) {
                 for (ProductoCosecha ap : activeHarvestProducts) {
                     if (ap.getNombre().equalsIgnoreCase(c.getNombre())) {
                         if (plan.contains("basico")) cant = ap.getCantidadBasico();
                         else if (plan.contains("familiar")) cant = ap.getCantidadFamiliar();
                         else if (plan.contains("premium")) cant = ap.getCantidadPremium();
+                        if (ap.getUnidad() != null && !ap.getUnidad().trim().isEmpty()) {
+                            unidad = ap.getUnidad().trim();
+                        }
                         break;
                     }
                 }
             }
             pMap.put("cantidad", cant);
-            pMap.put("unidad", c.getUnidadVenta() != null ? c.getUnidadVenta() : "ud");
+            pMap.put("unidad", unidad);
             productosMapList.add(pMap);
         }
 
@@ -300,6 +304,8 @@ public class TuListaBottomSheet extends BottomSheetDialogFragment {
         pedido.setFechaEntrega(fechaRecogida);
         pedido.setHoraEntrega(horaRecogida);
         pedido.setEstado("confirmado");
+        pedido.setEstadoPrevio(null);
+        pedido.setCancelacion(null);
         pedido.setFechaPedido(FieldValue.serverTimestamp());
 
         String pedidoDocId = (harvestId != null ? harvestId : "cosecha") + "_" + user.getUid();
@@ -331,17 +337,21 @@ public class TuListaBottomSheet extends BottomSheetDialogFragment {
             holder.tvName.setText(cultivo.getNombre());
 
             double cant = 1.0;
+            String harvestUnidad = cultivo.getUnidadVenta();
             if (activeHarvestProducts != null) {
                 for (ProductoCosecha ap : activeHarvestProducts) {
                     if (ap.getNombre().equalsIgnoreCase(cultivo.getNombre())) {
                         if (plan.contains("basico")) cant = ap.getCantidadBasico();
                         else if (plan.contains("familiar")) cant = ap.getCantidadFamiliar();
                         else if (plan.contains("premium")) cant = ap.getCantidadPremium();
+                        if (ap.getUnidad() != null && !ap.getUnidad().trim().isEmpty()) {
+                            harvestUnidad = ap.getUnidad().trim();
+                        }
                         break;
                     }
                 }
             }
-            String qtyStr = Formato.cantidad(cant, cultivo.getUnidadVenta());
+            String qtyStr = Formato.cantidad(cant, harvestUnidad);
             holder.tvQuantity.setText(qtyStr);
 
             int resId = holder.itemView.getContext().getResources().getIdentifier(cultivo.getImagen(), "drawable", holder.itemView.getContext().getPackageName());
