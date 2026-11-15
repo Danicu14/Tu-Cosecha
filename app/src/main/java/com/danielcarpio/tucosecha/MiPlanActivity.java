@@ -3,13 +3,13 @@ package com.danielcarpio.tucosecha;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.danielcarpio.tucosecha.model.Plan;
 import com.danielcarpio.tucosecha.util.Mensajes;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -49,7 +49,7 @@ public class MiPlanActivity extends AppCompatActivity {
         btnCambiarPlan.setOnClickListener(v -> finish());
 
         btnCancelarSuscripcion.setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
+            new MaterialAlertDialogBuilder(this)
                     .setTitle("Cancelar suscripción")
                     .setMessage("¿Estás seguro de que deseas cancelar tu suscripción actual? Perderás los beneficios del plan.")
                     .setPositiveButton("Sí, cancelar", (dialog, which) -> cancelarSuscripcion())

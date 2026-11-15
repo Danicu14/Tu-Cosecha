@@ -26,6 +26,7 @@ import com.danielcarpio.tucosecha.util.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -36,7 +37,7 @@ public class CuentaFragment extends Fragment {
     private TextView tvUserName, tvUserEmail, tvUserInitials;
     private Chip chipPlan;
     private MaterialButton btnLogout, btnCargarEjemplo, btnCargarNoticiasEjemplo, btnCargarPlanesEjemplo, btnCargarCosechaEjemplo, btnLoginFromAccount, btnRegisterFromAccount;
-    private View btnMyPlan;
+    private View btnMyPlan, btnMisDatos, btnMisPedidos;
     private MaterialCardView cardAdminTools;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -57,6 +58,8 @@ public class CuentaFragment extends Fragment {
         chipPlan = view.findViewById(R.id.chipPlan);
         btnLogout = view.findViewById(R.id.btnLogout);
         btnMyPlan = view.findViewById(R.id.btnMyPlan);
+        btnMisDatos = view.findViewById(R.id.btnMisDatos);
+        btnMisPedidos = view.findViewById(R.id.btnMisPedidos);
         btnCargarEjemplo = view.findViewById(R.id.btnCargarEjemplo);
         btnCargarNoticiasEjemplo = view.findViewById(R.id.btnCargarNoticiasEjemplo);
         btnCargarPlanesEjemplo = view.findViewById(R.id.btnCargarPlanesEjemplo);
@@ -88,6 +91,22 @@ public class CuentaFragment extends Fragment {
                 showGuestActionDialog();
             } else {
                 startActivity(new Intent(getActivity(), MiPlanActivity.class));
+            }
+        });
+
+        btnMisDatos.setOnClickListener(v -> {
+            if (SessionManager.isEsInvitado()) {
+                showGuestActionDialog();
+            } else {
+                startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.MisDatosActivity.class));
+            }
+        });
+
+        btnMisPedidos.setOnClickListener(v -> {
+            if (SessionManager.isEsInvitado()) {
+                showGuestActionDialog();
+            } else {
+                startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.MisPedidosActivity.class));
             }
         });
 
@@ -215,7 +234,7 @@ public class CuentaFragment extends Fragment {
     }
 
     private void showGuestActionDialog() {
-        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Acceso requerido")
                 .setMessage("Para acceder a esta función debes iniciar sesión o crear una cuenta.")
                 .setPositiveButton("Iniciar sesión", (dialog, which) -> {
@@ -282,6 +301,14 @@ public class CuentaFragment extends Fragment {
                         Log.e("CARGA_DATOS", "Error al cargar datos de usuario: " + e.getMessage(), e);
                         Mensajes.mostrarError(tvUserName, "Error al cargar datos: " + e.getMessage());
                     });
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!SessionManager.isEsInvitado()) {
+            loadUserData();
         }
     }
 }

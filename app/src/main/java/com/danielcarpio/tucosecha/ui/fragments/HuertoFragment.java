@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +20,7 @@ import com.danielcarpio.tucosecha.model.Cultivo;
 import com.danielcarpio.tucosecha.util.Mensajes;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -109,7 +109,7 @@ public class HuertoFragment extends Fragment {
         if (chipOrdenar != null) {
             chipOrdenar.setOnClickListener(v -> {
                 String[] opciones = {"Más listos primero", "A-Z", "Z-A"};
-                new AlertDialog.Builder(requireContext())
+                new MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Ordenar productos")
                         .setItems(opciones, (dialog, which) -> {
                             if (which == 0) sortOrder = "listos";

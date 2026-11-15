@@ -5,12 +5,85 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurface">
 
+    <!-- DRAFT STATE -->
+    <LinearLayout
+        android:id="@+id/layoutDraftState"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/layoutBottomCestaBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Crea tu Cesta · Talavera de la Reina"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/tvCestaSubTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Toca un producto para añadirlo a tu lista"
+                    android:textSize="13sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="16dp" />
+
+                <ProgressBar
+                    android:id="@+id/progressCestaLoading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginVertical="32dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvCestaEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No hay productos listos para cosechar esta semana"
+                    android:textSize="16sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:gravity="center"
+                    android:layout_marginVertical="32dp"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvCestaCultivos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+            </LinearLayout>
+
+        </ScrollView>
+    </LinearLayout>
+
+    <!-- CONFIRMED STATE -->
     <ScrollView
+        android:id="@+id/layoutConfirmedState"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/layoutBottomCestaBar"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -20,50 +93,106 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Header -->
-            <TextView
+            <!-- Green Gradient Top Card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Crea tu Cesta · Talavera de la Reina"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorPrimary" />
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#E8F5E9"
+                app:strokeWidth="1dp"
+                app:strokeColor="#C8E6C9"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/tvConfirmedHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Tu cesta está confirmada"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#1F5A2A" />
+
+                    <TextView
+                        android:id="@+id/tvConfirmedDetails"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Detalles del método y fecha..."
+                        android:textSize="14sp"
+                        android:textColor="#2E7D32"
+                        android:layout_marginTop="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvConfirmedDays"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Faltan N días"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#3E8E2F"
+                        android:layout_marginTop="12dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Productos locales de nuestra huerta · De la huerta a tu mesa"
-                android:textSize="13sp"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Loading / Empty states -->
-            <ProgressBar
-                android:id="@+id/progressCestaLoading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginVertical="32dp"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/tvCestaEmpty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="No hay productos listos para cosechar esta semana"
+                android:text="Productos de tu pedido"
                 android:textSize="16sp"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:gravity="center"
-                android:layout_marginVertical="32dp"
-                android:visibility="gone" />
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginBottom="8dp" />
 
-            <!-- Grid of Cultivos -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvCestaCultivos"
+                android:id="@+id/rvConfirmedProducts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
+                android:nestedScrollingEnabled="false"
+                android:layout_marginBottom="20dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnModificarPedido"
+                    style="@style/Widget.TuCosecha.Button.Tonal"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="Modificar pedido"
+                    android:layout_marginBottom="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCancelarPedido"
+                    style="@style/Widget.TuCosecha.Button.Destructive"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="Cancelar pedido" />
+
+                <TextView
+                    android:id="@+id/tvClosedOrderTag"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Pedido cerrado, lo estamos preparando"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#D32F2F"
+                    android:gravity="center"
+                    android:background="#FFCDD2"
+                    android:padding="16dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -73,52 +202,67 @@
     <LinearLayout
         android:id="@+id/layoutBottomCestaBar"
         android:layout_width="0dp"
-        android:layout_height="72dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:background="#FFFFFF"
-        android:paddingHorizontal="20dp"
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Thumbnails horizontal bar -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvThumbnails"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="6dp"
+            android:visibility="gone" />
+
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="20dp">
 
-            <TextView
-                android:id="@+id/tvCestaResumenVariedades"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Tu cesta: 0 de 8 variedades"
-                android:textSize="14sp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvCestaResumenVariedades"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tu lista: 0 de 8 variedades"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/tvCestaResumenPlan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Incluido en tu plan"
+                    android:textSize="13sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCestaAction"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:minWidth="150dp"
+                android:text="Confirmar cesta"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="?attr/colorPrimary" />
-
-            <TextView
-                android:id="@+id/tvCestaResumenPlan"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Incluido en tu plan"
-                android:textSize="13sp"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:layout_marginTop="2dp" />
+                app:cornerRadius="24dp" />
 
         </LinearLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCestaAction"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:minWidth="150dp"
-            android:text="Confirmar cesta"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:cornerRadius="24dp" />
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

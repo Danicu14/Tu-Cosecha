@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +23,7 @@ import com.danielcarpio.tucosecha.model.Noticia;
 import com.danielcarpio.tucosecha.util.Mensajes;
 import com.danielcarpio.tucosecha.util.SessionManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -76,7 +76,7 @@ public class NoticiasFragment extends Fragment {
             @Override
             public void onNoticiaLongClick(Noticia noticia) {
                 if (isAdmin) {
-                    new AlertDialog.Builder(requireContext())
+                    new MaterialAlertDialogBuilder(requireContext())
                             .setTitle("Eliminar noticia")
                             .setMessage("¿Estás seguro de que deseas eliminar esta noticia?")
                             .setPositiveButton("Eliminar", (dialog, which) -> {
