@@ -174,47 +174,56 @@ public class DatosEjemplo {
     public static void cargarPlanesEjemplo(OnPlanesLoadedListener listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("planes").get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (!queryDocumentSnapshots.isEmpty()) {
-                listener.onSuccess(0);
-                return;
-            }
+        WriteBatch batch = db.batch();
 
-            WriteBatch batch = db.batch();
+        Plan basico = new Plan("basico", "Plan Básico", "Ideal para 1-2 personas. Cesta semanal de hortalizas de temporada.", 39.0, "1 persona", 3, false,
+                Arrays.asList("Hortalizas frescas de temporada", "Entrega a domicilio o recogida en el huerto", "Recetario exclusivo digital"));
+        batch.set(db.collection("planes").document("basico"), basico);
 
-            Plan basico = new Plan("basico", "Plan Básico", "Ideal para 1-2 personas. Cesta semanal de hortalizas de temporada.", 39.0, "1 persona", 4, false,
-                    Arrays.asList("Hortalizas frescas de temporada", "Recogida semanal en punto asignado", "Recetario exclusivo digital"));
-            batch.set(db.collection("planes").document("basico"), basico);
+        Plan familiar = new Plan("familiar", "Plan Familiar", "Perfecto para familias. Gran variedad de verduras y frutas frescas.", 69.0, "3-4 personas", 4, false,
+                Arrays.asList("Verduras y frutas de temporada", "Doble ración de productos estrella", "Prioridad en elección de entrega"));
+        batch.set(db.collection("planes").document("familiar"), familiar);
 
-            Plan familiar = new Plan("familiar", "Plan Familiar", "Perfecto para familias. Gran variedad de verduras y frutas frescas.", 69.0, "3-4 personas", 6, false,
-                    Arrays.asList("Verduras y frutas de temporada", "Doble ración de productos estrella", "Prioridad en elección de entrega"));
-            batch.set(db.collection("planes").document("familiar"), familiar);
+        Plan premium = new Plan("premium", "Plan Premium", "Máxima variedad, productos ecológicos extra y visitas guiadas al huerto.", 99.0, "3-4 personas", 6, true,
+                Arrays.asList("Máxima variedad y productos ecológicos extra", "Prioridad absoluta en productos escasos", "Visitas guiadas y talleres en el huerto"));
+        batch.set(db.collection("planes").document("premium"), premium);
 
-            Plan premium = new Plan("premium", "Plan Premium", "Máxima variedad, productos ecológicos extra y visitas guiadas al huerto.", 99.0, "3-4 personas", 8, true,
-                    Arrays.asList("Máxima variedad y productos ecológicos extra", "Prioridad absoluta en productos escasos", "Visitas guiadas y talleres en el huerto"));
-            batch.set(db.collection("planes").document("premium"), premium);
-
-            batch.commit()
-                    .addOnSuccessListener(aVoid -> listener.onSuccess(3))
-                    .addOnFailureListener(e -> {
-                        Log.e("CARGA_DATOS", "Error al cargar planes: " + e.getMessage(), e);
-                        listener.onError(e);
-                    });
-
-        }).addOnFailureListener(e -> {
-            Log.e("CARGA_DATOS", "Error al verificar planes: " + e.getMessage(), e);
-            listener.onError(e);
-        });
+        batch.commit()
+                .addOnSuccessListener(aVoid -> listener.onSuccess(3))
+                .addOnFailureListener(e -> {
+                    Log.e("CARGA_DATOS", "Error al cargar planes: " + e.getMessage(), e);
+                    listener.onError(e);
+                });
     }
 
     public static void cargarCosechaEjemplo(OnCosechaLoadedListener listener) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        Calendar calendar = Calendar.getInstance();
-        while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
-            calendar.add(Calendar.DAY_OF_YEAR, 1);
+        Calendar calEntrega = Calendar.getInstance();
+        calEntrega.add(Calendar.DAY_OF_YEAR, 4);
+        while (calEntrega.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) {
+            calEntrega.add(Calendar.DAY_OF_YEAR, 1);
         }
-        String fechaRecogida = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendar.getTime());
+        String fechaRecogida = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calEntrega.getTime());
+
+        Calendar calInicioSemana = (Calendar) calEntrega.clone();
+        calInicioSemana.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        if (calInicioSemana.after(calEntrega)) {
+            calInicioSemana.add(Calendar.DAY_OF_YEAR, -7);
+        }
+
+        Calendar calFinSemana = (Calendar) calInicioSemana.clone();
+        calFinSemana.add(Calendar.DAY_OF_YEAR, 6);
+
+        Locale esLocale = Locale.forLanguageTag("es-ES");
+        SimpleDateFormat sdfDia = new SimpleDateFormat("d", esLocale);
+        SimpleDateFormat sdfMes = new SimpleDateFormat("MMMM", esLocale);
+        String textoSemana;
+        if (calInicioSemana.get(Calendar.MONTH) == calFinSemana.get(Calendar.MONTH)) {
+            textoSemana = "Semana del " + sdfDia.format(calInicioSemana.getTime()) + " al " + sdfDia.format(calFinSemana.getTime()) + " de " + sdfMes.format(calFinSemana.getTime());
+        } else {
+            textoSemana = "Semana del " + sdfDia.format(calInicioSemana.getTime()) + " de " + sdfMes.format(calInicioSemana.getTime()) + " al " + sdfDia.format(calFinSemana.getTime()) + " de " + sdfMes.format(calFinSemana.getTime());
+        }
 
         List<ProductoCosecha> productos = new ArrayList<>();
         productos.add(new ProductoCosecha("Zanahoria", "zanahoria", "kg", 1, 2, 3, false));
@@ -227,7 +236,7 @@ public class DatosEjemplo {
         productos.add(new ProductoCosecha("Cebolla morada", "cebolla_morada", "kg", 0, 0, 1, true));
 
         Map<String, Object> cosechaMap = new HashMap<>();
-        cosechaMap.put("semana", "Semana actual en curso");
+        cosechaMap.put("semana", textoSemana);
         cosechaMap.put("fechaRecogida", fechaRecogida);
         cosechaMap.put("horaRecogida", "10:00 a 13:00");
         cosechaMap.put("lugarRecogida", "Huerto Tu Cosecha, vega del Tajo, Talavera de la Reina");

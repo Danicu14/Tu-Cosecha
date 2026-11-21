@@ -128,7 +128,7 @@ public class RegistroActivity extends AppCompatActivity {
                         String uid = task.getResult().getUser().getUid();
                         String fechaAlta = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
 
-                        Usuario usuario = new Usuario(uid, name, surname, email, "suscriptor", "ninguno", "inactivo", fechaAlta, null);
+                        Usuario usuario = new Usuario(uid, name, surname, email, "suscriptor", "ninguno", fechaAlta);
 
                         db.collection("usuarios").document(uid)
                                 .set(usuario)
