@@ -35,6 +35,30 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Selector de cosecha -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilSelectorCosecha"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:hint="Cosecha seleccionada"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp">
+
+                <AutoCompleteTextView
+                    android:id="@+id/actvSelectorCosecha"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none"
+                    android:paddingVertical="14dp"
+                    android:textSize="15sp"
+                    android:textColor="?attr/colorOnSurface" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
             <!-- Card Total a preparar -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardTotalPreparar"

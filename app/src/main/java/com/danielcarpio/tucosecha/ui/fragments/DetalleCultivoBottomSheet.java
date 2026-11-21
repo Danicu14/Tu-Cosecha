@@ -20,6 +20,7 @@ import com.google.android.material.chip.Chip;
 
 public class DetalleCultivoBottomSheet extends BottomSheetDialogFragment {
 
+    private static final String ARG_CULTIVO_ID = "id";
     private static final String ARG_CULTIVO_NOMBRE = "nombre";
     private static final String ARG_CULTIVO_IMAGEN = "imagen";
     private static final String ARG_CULTIVO_FASE = "fase";
@@ -31,6 +32,7 @@ public class DetalleCultivoBottomSheet extends BottomSheetDialogFragment {
     public static DetalleCultivoBottomSheet newInstance(Cultivo cultivo) {
         DetalleCultivoBottomSheet fragment = new DetalleCultivoBottomSheet();
         Bundle args = new Bundle();
+        args.putString(ARG_CULTIVO_ID, cultivo.getId() != null ? cultivo.getId() : cultivo.getNombre());
         args.putString(ARG_CULTIVO_NOMBRE, cultivo.getNombre());
         args.putString(ARG_CULTIVO_IMAGEN, cultivo.getImagen());
         args.putString(ARG_CULTIVO_FASE, cultivo.getFase());
@@ -92,6 +94,49 @@ public class DetalleCultivoBottomSheet extends BottomSheetDialogFragment {
                     resId = R.drawable.logo_tucosecha;
                 }
                 img.setImageResource(resId);
+            }
+
+            com.google.android.material.button.MaterialButton btnEditar = view.findViewById(R.id.btnEditarCultivoBottomSheet);
+            com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null && btnEditar != null) {
+                com.google.firebase.firestore.FirebaseFirestore.getInstance().collection("usuarios").document(user.getUid()).get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists() && isAdded()) {
+                                com.danielcarpio.tucosecha.model.Usuario usuario = documentSnapshot.toObject(com.danielcarpio.tucosecha.model.Usuario.class);
+                                if (usuario != null && "administrador".equalsIgnoreCase(usuario.getRol())) {
+                                    btnEditar.setVisibility(View.VISIBLE);
+                                    btnEditar.setOnClickListener(v -> {
+                                        Cultivo c = new Cultivo();
+                                        c.setId(getArguments().getString(ARG_CULTIVO_ID));
+                                        c.setNombre(nombre);
+                                        c.setFase(fase);
+                                        c.setProgreso(progreso);
+                                        c.setFechaCosechaEstimada(cosecha);
+                                        c.setDescripcion(descripcion);
+
+                                        EditarCultivoBottomSheet editSheet = EditarCultivoBottomSheet.newInstance(c);
+                                        editSheet.setOnCultivoUpdatedListener((cId, nFase, nProgreso, nFecha, nDesc) -> {
+                                            tvDesc.setText(nDesc);
+                                            tvProgresoText.setText(nProgreso + "%");
+                                            progressBar.setProgress(nProgreso);
+                                            tvCosecha.setText("Fecha estimada de cosecha: " + (nFecha != null && !nFecha.isEmpty() ? nFecha : "-"));
+                                            chipFase.setText(capitalize(nFase));
+                                            if (nFase.equalsIgnoreCase("listo")) {
+                                                chipFase.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#3E8E2F")));
+                                                chipFase.setTextColor(Color.WHITE);
+                                            } else if (nFase.equalsIgnoreCase("creciendo")) {
+                                                chipFase.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#FFB300")));
+                                                chipFase.setTextColor(Color.BLACK);
+                                            } else if (nFase.equalsIgnoreCase("sembrado")) {
+                                                chipFase.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#8B5A2B")));
+                                                chipFase.setTextColor(Color.WHITE);
+                                            }
+                                        });
+                                        editSheet.show(getParentFragmentManager(), "EditarCultivoBottomSheet");
+                                    });
+                                }
+                            }
+                        });
             }
         }
 

@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -58,8 +60,13 @@ public class PedidosAdminActivity extends AppCompatActivity {
     private ListenerRegistration harvestListener;
     private ListenerRegistration pedidosListener;
 
-    private String activeHarvestId = null;
-    private String activeHarvestSemana = null;
+    private AutoCompleteTextView actvSelectorCosecha;
+    private final List<Cosecha> listaCosechas = new ArrayList<>();
+    private final List<String> opcionesCosechasLabels = new ArrayList<>();
+    private ArrayAdapter<String> cosechasAdapter;
+    private String selectedHarvestId = null;
+    private String selectedHarvestSemana = null;
+    private boolean isSelectedHarvestActiva = true;
     private final List<Pedido> allPedidos = new ArrayList<>();
     private final List<Pedido> filteredPedidos = new ArrayList<>();
     private PedidosAdminAdapter adapter;
@@ -81,6 +88,7 @@ public class PedidosAdminActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbarPedidosAdmin);
         toolbar.setNavigationOnClickListener(v -> finish());
 
+        actvSelectorCosecha = findViewById(R.id.actvSelectorCosecha);
         progressAdminLoading = findViewById(R.id.progressAdminLoading);
         tvSemanaCosechaAdmin = findViewById(R.id.tvSemanaCosechaAdmin);
         tvTotalPrepararResumen = findViewById(R.id.tvTotalPrepararResumen);
@@ -126,6 +134,7 @@ public class PedidosAdminActivity extends AppCompatActivity {
     private void checkAdminRoleAndLoad() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
+            Mensajes.mostrarError(findViewById(android.R.id.content), "Acceso solo para el hortelano");
             finish();
             return;
         }
@@ -136,12 +145,14 @@ public class PedidosAdminActivity extends AppCompatActivity {
         db.collection("usuarios").document(user.getUid()).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (!documentSnapshot.exists()) {
+                        Mensajes.mostrarError(findViewById(android.R.id.content), "Acceso solo para el hortelano");
                         finish();
                         return;
                     }
 
                     Usuario usuario = documentSnapshot.toObject(Usuario.class);
                     if (usuario == null || !"administrador".equalsIgnoreCase(usuario.getRol())) {
+                        Mensajes.mostrarError(findViewById(android.R.id.content), "Acceso solo para el hortelano");
                         finish();
                         return;
                     }
@@ -159,39 +170,100 @@ public class PedidosAdminActivity extends AppCompatActivity {
         if (harvestListener != null) harvestListener.remove();
 
         harvestListener = db.collection("cosechas")
-                .whereEqualTo("activa", true)
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
-                        Log.e("PEDIDOS_ADMIN", "Error al cargar cosecha: " + e.getMessage(), e);
+                        Log.e("PEDIDOS_ADMIN", "Error al cargar cosechas: " + e.getMessage(), e);
                         progressAdminLoading.setVisibility(View.GONE);
                         layoutErrorAdmin.setVisibility(View.VISIBLE);
-                        Mensajes.mostrarError(toolbar, "Error al cargar cosecha activa");
+                        Mensajes.mostrarError(toolbar, "Error al cargar cosechas");
                         return;
                     }
 
-                    activeHarvestId = null;
-                    activeHarvestSemana = null;
+                    listaCosechas.clear();
+                    opcionesCosechasLabels.clear();
+
+                    Cosecha cosechaActiva = null;
+                    List<Cosecha> otrasCosechas = new ArrayList<>();
 
                     if (snapshots != null && !snapshots.isEmpty()) {
                         for (QueryDocumentSnapshot doc : snapshots) {
                             Cosecha cosecha = doc.toObject(Cosecha.class);
-                            activeHarvestId = doc.getId();
-                            activeHarvestSemana = cosecha.getSemana();
-                            break;
+                            cosecha.setId(doc.getId());
+                            if (cosecha.isActiva()) {
+                                cosechaActiva = cosecha;
+                            } else {
+                                otrasCosechas.add(cosecha);
+                            }
                         }
                     }
 
-                    if (activeHarvestId == null) {
+                    // Ordenar las otras cosechas por fecha de más reciente a más antigua
+                    Collections.sort(otrasCosechas, (c1, c2) -> {
+                        String s1 = c1.getFechaRecogida() != null ? c1.getFechaRecogida() : "";
+                        String s2 = c2.getFechaRecogida() != null ? c2.getFechaRecogida() : "";
+                        return s2.compareTo(s1);
+                    });
+
+                    int indexToSelect = 0;
+                    if (cosechaActiva != null) {
+                        listaCosechas.add(cosechaActiva);
+                        String label = "Cosecha activa (" + (cosechaActiva.getSemana() != null ? cosechaActiva.getSemana() : "") + ")";
+                        opcionesCosechasLabels.add(label);
+                    }
+
+                    for (Cosecha c : otrasCosechas) {
+                        listaCosechas.add(c);
+                        String label = c.getSemana() != null && !c.getSemana().isEmpty() ? c.getSemana() : ("Cosecha " + (c.getFechaRecogida() != null ? c.getFechaRecogida() : c.getId()));
+                        opcionesCosechasLabels.add(label);
+                    }
+
+                    if (listaCosechas.isEmpty()) {
                         progressAdminLoading.setVisibility(View.GONE);
-                        tvSemanaCosechaAdmin.setText("No hay cosecha activa");
-                        tvTotalPrepararResumen.setText("Sin pedidos pendientes");
+                        tvSemanaCosechaAdmin.setText("No hay cosechas registradas");
+                        tvTotalPrepararResumen.setText("Sin pedidos");
                         allPedidos.clear();
                         aplicarFiltroYActualizarUI();
+                        if (actvSelectorCosecha != null) {
+                            actvSelectorCosecha.setText("", false);
+                            actvSelectorCosecha.setAdapter(null);
+                        }
                         return;
                     }
 
-                    tvSemanaCosechaAdmin.setText(activeHarvestSemana != null ? activeHarvestSemana : "Cosecha activa");
-                    listenPedidosRealtime(activeHarvestId);
+                    // Si ya había una cosecha seleccionada que sigue existiendo, mantenerla
+                    if (selectedHarvestId != null) {
+                        for (int i = 0; i < listaCosechas.size(); i++) {
+                            if (listaCosechas.get(i).getId().equals(selectedHarvestId)) {
+                                indexToSelect = i;
+                                break;
+                            }
+                        }
+                    }
+
+                    Cosecha selected = listaCosechas.get(indexToSelect);
+                    selectedHarvestId = selected.getId();
+                    selectedHarvestSemana = selected.getSemana();
+                    isSelectedHarvestActiva = selected.isActiva();
+
+                    cosechasAdapter = new ArrayAdapter<>(PedidosAdminActivity.this, android.R.layout.simple_dropdown_item_1line, opcionesCosechasLabels);
+                    if (actvSelectorCosecha != null) {
+                        actvSelectorCosecha.setAdapter(cosechasAdapter);
+                        actvSelectorCosecha.setText(opcionesCosechasLabels.get(indexToSelect), false);
+                        actvSelectorCosecha.setOnItemClickListener((parent, v, position, id) -> {
+                            if (position >= 0 && position < listaCosechas.size()) {
+                                Cosecha elegida = listaCosechas.get(position);
+                                selectedHarvestId = elegida.getId();
+                                selectedHarvestSemana = elegida.getSemana();
+                                isSelectedHarvestActiva = elegida.isActiva();
+                                tvSemanaCosechaAdmin.setText(isSelectedHarvestActiva ? "Cosecha activa (" + (selectedHarvestSemana != null ? selectedHarvestSemana : "") + ")" : (selectedHarvestSemana != null ? selectedHarvestSemana : "Cosecha"));
+                                progressAdminLoading.setVisibility(View.VISIBLE);
+                                listenPedidosRealtime(selectedHarvestId);
+                            }
+                        });
+                    }
+
+                    tvSemanaCosechaAdmin.setText(isSelectedHarvestActiva ? "Cosecha activa (" + (selectedHarvestSemana != null ? selectedHarvestSemana : "") + ")" : (selectedHarvestSemana != null ? selectedHarvestSemana : "Cosecha"));
+                    listenPedidosRealtime(selectedHarvestId);
                 });
     }
 

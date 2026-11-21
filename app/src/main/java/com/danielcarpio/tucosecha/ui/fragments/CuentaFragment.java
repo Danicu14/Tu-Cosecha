@@ -134,6 +134,28 @@ public class CuentaFragment extends Fragment {
             });
         }
 
+        View btnOptionCosechaAdmin = view.findViewById(R.id.btnOptionCosechaAdmin);
+        View cardOptionCosechaAdmin = view.findViewById(R.id.cardOptionCosechaAdmin);
+        if (btnOptionCosechaAdmin != null) {
+            btnOptionCosechaAdmin.setOnClickListener(v -> startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.PublicarCosechaActivity.class)));
+        }
+        if (cardOptionCosechaAdmin != null) {
+            cardOptionCosechaAdmin.setOnClickListener(v -> {
+                if (btnOptionCosechaAdmin != null) btnOptionCosechaAdmin.performClick();
+            });
+        }
+
+        View btnOptionCultivosAdmin = view.findViewById(R.id.btnOptionCultivosAdmin);
+        View cardOptionCultivosAdmin = view.findViewById(R.id.cardOptionCultivosAdmin);
+        if (btnOptionCultivosAdmin != null) {
+            btnOptionCultivosAdmin.setOnClickListener(v -> startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.GestionCultivosActivity.class)));
+        }
+        if (cardOptionCultivosAdmin != null) {
+            cardOptionCultivosAdmin.setOnClickListener(v -> {
+                if (btnOptionCultivosAdmin != null) btnOptionCultivosAdmin.performClick();
+            });
+        }
+
         btnCargarEjemplo.setOnClickListener(v -> {
             btnCargarEjemplo.setEnabled(false);
             btnCargarEjemplo.setText("Cargando datos...");
