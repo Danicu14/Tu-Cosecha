@@ -18,8 +18,8 @@ import com.danielcarpio.tucosecha.ui.fragments.CuentaFragment;
 import com.danielcarpio.tucosecha.ui.fragments.HuertoFragment;
 import com.danielcarpio.tucosecha.ui.fragments.NoticiasFragment;
 import com.danielcarpio.tucosecha.util.EstadoPedido;
+import com.danielcarpio.tucosecha.util.GestorSesion;
 import com.danielcarpio.tucosecha.util.Mensajes;
-import com.danielcarpio.tucosecha.util.SessionManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
@@ -32,8 +32,8 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String KEY_SELECTED_TAB = "selected_tab";
-    private int currentPosition = 0;
+    private static final String CLAVE_PESTANA_SELECCIONADA = "pestana_seleccionada";
+    private int posicionActual = 0;
 
     private View tabCesta, tabProductos, tabNoticias, tabZona;
     private ImageView imgCesta, imgProductos, imgNoticias, imgZona;
@@ -71,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
         tabZona.setOnClickListener(v -> seleccionar(3));
 
         if (savedInstanceState != null) {
-            currentPosition = savedInstanceState.getInt(KEY_SELECTED_TAB, 0);
-            seleccionar(currentPosition);
+            posicionActual = savedInstanceState.getInt(CLAVE_PESTANA_SELECCIONADA, 0);
+            seleccionar(posicionActual);
         } else {
             seleccionar(0);
         }
@@ -84,98 +84,98 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private ListenerRegistration ordersNotificationListener;
-    private final Map<String, String> lastOrderStates = new HashMap<>();
-    private final Map<String, String> lastOrderCancelRespuesta = new HashMap<>();
-    private boolean isOrdersFirstLoad = true;
+    private ListenerRegistration listenerNotificacionesPedidos;
+    private final Map<String, String> ultimosEstadosPedidos = new HashMap<>();
+    private final Map<String, String> ultimaRespuestaCancelacionPedidos = new HashMap<>();
+    private boolean esPrimeraCargaPedidos = true;
 
     @Override
     protected void onStart() {
         super.onStart();
-        startOrdersNotificationListener();
+        iniciarEscuchaNotificacionesPedidos();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (ordersNotificationListener != null) {
-            ordersNotificationListener.remove();
-            ordersNotificationListener = null;
+        if (listenerNotificacionesPedidos != null) {
+            listenerNotificacionesPedidos.remove();
+            listenerNotificacionesPedidos = null;
         }
     }
 
-    private void startOrdersNotificationListener() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null || SessionManager.isEsInvitado()) return;
+    private void iniciarEscuchaNotificacionesPedidos() {
+        FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
+        if (usuario == null || GestorSesion.esInvitado()) return;
 
-        if (ordersNotificationListener != null) ordersNotificationListener.remove();
-        isOrdersFirstLoad = true;
-        lastOrderStates.clear();
-        lastOrderCancelRespuesta.clear();
+        if (listenerNotificacionesPedidos != null) listenerNotificacionesPedidos.remove();
+        esPrimeraCargaPedidos = true;
+        ultimosEstadosPedidos.clear();
+        ultimaRespuestaCancelacionPedidos.clear();
 
-        ordersNotificationListener = FirebaseFirestore.getInstance()
+        listenerNotificacionesPedidos = FirebaseFirestore.getInstance()
                 .collection("pedidos")
-                .whereEqualTo("uid", user.getUid())
-                .addSnapshotListener((snapshots, e) -> {
-                    if (e != null || snapshots == null) return;
+                .whereEqualTo("uid", usuario.getUid())
+                .addSnapshotListener((instantaneas, e) -> {
+                    if (e != null || instantaneas == null) return;
 
-                    if (isOrdersFirstLoad) {
-                        for (DocumentSnapshot doc : snapshots.getDocuments()) {
-                            lastOrderStates.put(doc.getId(), doc.getString("estado"));
-                            Map<String, Object> cancel = (Map<String, Object>) doc.get("cancelacion");
-                            if (cancel != null && cancel.get("respuesta") != null) {
-                                lastOrderCancelRespuesta.put(doc.getId(), String.valueOf(cancel.get("respuesta")));
+                    if (esPrimeraCargaPedidos) {
+                        for (DocumentSnapshot doc : instantaneas.getDocuments()) {
+                            ultimosEstadosPedidos.put(doc.getId(), doc.getString("estado"));
+                            Map<String, Object> cancelacion = (Map<String, Object>) doc.get("cancelacion");
+                            if (cancelacion != null && cancelacion.get("respuesta") != null) {
+                                ultimaRespuestaCancelacionPedidos.put(doc.getId(), String.valueOf(cancelacion.get("respuesta")));
                             }
                         }
-                        isOrdersFirstLoad = false;
+                        esPrimeraCargaPedidos = false;
                         return;
                     }
 
-                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                        if (dc.getType() == DocumentChange.Type.MODIFIED) {
-                            DocumentSnapshot doc = dc.getDocument();
+                    for (DocumentChange cambioDoc : instantaneas.getDocumentChanges()) {
+                        if (cambioDoc.getType() == DocumentChange.Type.MODIFIED) {
+                            DocumentSnapshot doc = cambioDoc.getDocument();
                             String docId = doc.getId();
-                            String newEstado = doc.getString("estado");
-                            String oldEstado = lastOrderStates.get(docId);
+                            String nuevoEstado = doc.getString("estado");
+                            String viejoEstado = ultimosEstadosPedidos.get(docId);
 
-                            Map<String, Object> cancel = (Map<String, Object>) doc.get("cancelacion");
-                            String newRespuesta = (cancel != null && cancel.get("respuesta") != null) ? String.valueOf(cancel.get("respuesta")) : null;
-                            String oldRespuesta = lastOrderCancelRespuesta.get(docId);
+                            Map<String, Object> cancelacion = (Map<String, Object>) doc.get("cancelacion");
+                            String nuevaRespuesta = (cancelacion != null && cancelacion.get("respuesta") != null) ? String.valueOf(cancelacion.get("respuesta")) : null;
+                            String viejaRespuesta = ultimaRespuestaCancelacionPedidos.get(docId);
 
-                            View anchor = findViewById(R.id.main);
-                            if (anchor != null) {
-                                if (newEstado != null && !newEstado.equalsIgnoreCase(oldEstado)) {
-                                    if (EstadoPedido.CANCELADO.equalsIgnoreCase(newEstado)) {
-                                        if ("aceptada".equalsIgnoreCase(newRespuesta)) {
-                                            Mensajes.mostrarInfo(anchor, "Tu cancelación ha sido aceptada");
+                            View anclaje = findViewById(R.id.main);
+                            if (anclaje != null) {
+                                if (nuevoEstado != null && !nuevoEstado.equalsIgnoreCase(viejoEstado)) {
+                                    if (EstadoPedido.CANCELADO.equalsIgnoreCase(nuevoEstado)) {
+                                        if ("aceptada".equalsIgnoreCase(nuevaRespuesta)) {
+                                            Mensajes.mostrarInfo(anclaje, "Tu cancelación ha sido aceptada");
                                         } else {
-                                            Mensajes.mostrarInfo(anchor, "Pedido cancelado");
+                                            Mensajes.mostrarInfo(anclaje, "Pedido cancelado");
                                         }
-                                    } else if (EstadoPedido.EN_CAMINO.equalsIgnoreCase(newEstado)) {
-                                        Mensajes.mostrarInfo(anchor, "¡Tu pedido está en camino!");
-                                    } else if (EstadoPedido.LISTO_PARA_RECOGER.equalsIgnoreCase(newEstado)) {
-                                        Mensajes.mostrarInfo(anchor, "Tu cesta te espera en el huerto");
-                                    } else if (EstadoPedido.PREPARANDO.equalsIgnoreCase(newEstado)) {
-                                        Mensajes.mostrarInfo(anchor, "Estamos preparando tu cesta");
-                                    } else if (EstadoPedido.ENTREGADO.equalsIgnoreCase(newEstado)) {
-                                        Mensajes.mostrarInfo(anchor, "¡Cesta entregada! Que aproveche");
-                                    } else if (EstadoPedido.CANCELACION_SOLICITADA.equalsIgnoreCase(newEstado)) {
-                                        Mensajes.mostrarInfo(anchor, "Cancelación solicitada");
+                                    } else if (EstadoPedido.EN_CAMINO.equalsIgnoreCase(nuevoEstado)) {
+                                        Mensajes.mostrarInfo(anclaje, "¡Tu pedido está en camino!");
+                                    } else if (EstadoPedido.LISTO_PARA_RECOGER.equalsIgnoreCase(nuevoEstado)) {
+                                        Mensajes.mostrarInfo(anclaje, "Tu cesta te espera en el huerto");
+                                    } else if (EstadoPedido.PREPARANDO.equalsIgnoreCase(nuevoEstado)) {
+                                        Mensajes.mostrarInfo(anclaje, "Estamos preparando tu cesta");
+                                    } else if (EstadoPedido.ENTREGADO.equalsIgnoreCase(nuevoEstado)) {
+                                        Mensajes.mostrarInfo(anclaje, "¡Cesta entregada! Que aproveche");
+                                    } else if (EstadoPedido.CANCELACION_SOLICITADA.equalsIgnoreCase(nuevoEstado)) {
+                                        Mensajes.mostrarInfo(anclaje, "Cancelación solicitada");
                                     } else {
-                                        Mensajes.mostrarInfo(anchor, EstadoPedido.getMensajeEstado(newEstado));
+                                        Mensajes.mostrarInfo(anclaje, EstadoPedido.getMensajeEstado(nuevoEstado));
                                     }
-                                } else if (newRespuesta != null && !newRespuesta.equalsIgnoreCase(oldRespuesta)) {
-                                    if ("rechazada".equalsIgnoreCase(newRespuesta)) {
-                                        Mensajes.mostrarInfo(anchor, "El huerto no ha podido cancelar tu pedido");
-                                    } else if ("aceptada".equalsIgnoreCase(newRespuesta)) {
-                                        Mensajes.mostrarInfo(anchor, "Tu cancelación ha sido aceptada");
+                                } else if (nuevaRespuesta != null && !nuevaRespuesta.equalsIgnoreCase(viejaRespuesta)) {
+                                    if ("rechazada".equalsIgnoreCase(nuevaRespuesta)) {
+                                        Mensajes.mostrarInfo(anclaje, "El huerto no ha podido cancelar tu pedido");
+                                    } else if ("aceptada".equalsIgnoreCase(nuevaRespuesta)) {
+                                        Mensajes.mostrarInfo(anclaje, "Tu cancelación ha sido aceptada");
                                     }
                                 }
                             }
 
-                            lastOrderStates.put(docId, newEstado);
-                            if (newRespuesta != null) {
-                                lastOrderCancelRespuesta.put(docId, newRespuesta);
+                            ultimosEstadosPedidos.put(docId, nuevoEstado);
+                            if (nuevaRespuesta != null) {
+                                ultimaRespuestaCancelacionPedidos.put(docId, nuevaRespuesta);
                             }
                         }
                     }
@@ -183,79 +183,79 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(KEY_SELECTED_TAB, currentPosition);
+    protected void onSaveInstanceState(@NonNull Bundle estadoSalida) {
+        super.onSaveInstanceState(estadoSalida);
+        estadoSalida.putInt(CLAVE_PESTANA_SELECCIONADA, posicionActual);
     }
 
     private void seleccionar(int posicion) {
-        currentPosition = posicion;
-        Fragment fragment;
+        posicionActual = posicion;
+        Fragment fragmento;
 
         switch (posicion) {
             case 0:
-                fragment = new CestaFragment();
+                fragmento = new CestaFragment();
                 break;
             case 1:
-                fragment = new HuertoFragment();
+                fragmento = new HuertoFragment();
                 break;
             case 2:
-                fragment = new NoticiasFragment();
+                fragmento = new NoticiasFragment();
                 break;
             case 3:
             default:
-                fragment = new CuentaFragment();
+                fragmento = new CuentaFragment();
                 break;
         }
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.navHostFragment, fragment)
+                .replace(R.id.navHostFragment, fragmento)
                 .commit();
 
-        updateNavUI(posicion);
+        actualizarInterfazNavegacion(posicion);
     }
 
-    private void updateNavUI(int activePos) {
-        int activeTextColor = Color.parseColor("#1F5A2A");
-        int inactiveTextColor = Color.parseColor("#6B7A5E");
+    private void actualizarInterfazNavegacion(int posActiva) {
+        int colorTextoActivo = Color.parseColor("#1F5A2A");
+        int colorTextoInactivo = Color.parseColor("#6B7A5E");
 
-        // Item 0: Cesta
-        boolean isCesta = (activePos == 0);
-        animateItem(imgCesta, isCesta);
-        tvCesta.setTextColor(isCesta ? activeTextColor : inactiveTextColor);
-        tvCesta.getPaint().setFakeBoldText(isCesta);
-        lineCesta.setVisibility(isCesta ? View.VISIBLE : View.INVISIBLE);
+        // Elemento 0: Cesta
+        boolean esCesta = (posActiva == 0);
+        animarElemento(imgCesta, esCesta);
+        tvCesta.setTextColor(esCesta ? colorTextoActivo : colorTextoInactivo);
+        tvCesta.getPaint().setFakeBoldText(esCesta);
+        lineCesta.setVisibility(esCesta ? View.VISIBLE : View.INVISIBLE);
 
-        // Item 1: Productos
-        boolean isProductos = (activePos == 1);
-        animateItem(imgProductos, isProductos);
-        tvProductos.setTextColor(isProductos ? activeTextColor : inactiveTextColor);
-        tvProductos.getPaint().setFakeBoldText(isProductos);
-        lineProductos.setVisibility(isProductos ? View.VISIBLE : View.INVISIBLE);
+        // Elemento 1: Productos
+        boolean esProductos = (posActiva == 1);
+        animarElemento(imgProductos, esProductos);
+        tvProductos.setTextColor(esProductos ? colorTextoActivo : colorTextoInactivo);
+        tvProductos.getPaint().setFakeBoldText(esProductos);
+        lineProductos.setVisibility(esProductos ? View.VISIBLE : View.INVISIBLE);
 
-        // Item 2: Noticias
-        boolean isNoticias = (activePos == 2);
-        animateItem(imgNoticias, isNoticias);
-        tvNoticias.setTextColor(isNoticias ? activeTextColor : inactiveTextColor);
-        tvNoticias.getPaint().setFakeBoldText(isNoticias);
-        lineNoticias.setVisibility(isNoticias ? View.VISIBLE : View.INVISIBLE);
+        // Elemento 2: Noticias
+        boolean esNoticias = (posActiva == 2);
+        animarElemento(imgNoticias, esNoticias);
+        tvNoticias.setTextColor(esNoticias ? colorTextoActivo : colorTextoInactivo);
+        tvNoticias.getPaint().setFakeBoldText(esNoticias);
+        lineNoticias.setVisibility(esNoticias ? View.VISIBLE : View.INVISIBLE);
 
-        // Item 3: Mi Zona
-        boolean isZona = (activePos == 3);
-        animateItem(imgZona, isZona);
-        tvZona.setTextColor(isZona ? activeTextColor : inactiveTextColor);
-        tvZona.getPaint().setFakeBoldText(isZona);
-        lineZona.setVisibility(isZona ? View.VISIBLE : View.INVISIBLE);
+        // Elemento 3: Mi Zona
+        boolean esZona = (posActiva == 3);
+        animarElemento(imgZona, esZona);
+        tvZona.setTextColor(esZona ? colorTextoActivo : colorTextoInactivo);
+        tvZona.getPaint().setFakeBoldText(esZona);
+        lineZona.setVisibility(esZona ? View.VISIBLE : View.INVISIBLE);
     }
 
-    private void animateItem(View iconView, boolean active) {
-        float scale = active ? 1.1f : 1.0f;
-        float alpha = active ? 1.0f : 0.7f;
+    private void animarElemento(View vistaIcono, boolean activo) {
+        float escala = activo ? 1.1f : 1.0f;
+        float alfa = activo ? 1.0f : 0.7f;
 
-        iconView.animate()
-                .scaleX(scale)
-                .scaleY(scale)
-                .alpha(alpha)
+        vistaIcono.animate()
+                .scaleX(escala)
+                .scaleY(escala)
+                .alpha(alfa)
                 .setDuration(150)
                 .start();
     }

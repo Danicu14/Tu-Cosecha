@@ -11,8 +11,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.danielcarpio.tucosecha.model.Usuario;
+import com.danielcarpio.tucosecha.util.GestorSesion;
 import com.danielcarpio.tucosecha.util.Mensajes;
-import com.danielcarpio.tucosecha.util.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -25,8 +25,8 @@ import java.util.Locale;
 
 public class RegistroActivity extends AppCompatActivity {
 
-    private TextInputLayout tilName, tilSurname, tilEmail, tilPassword, tilConfirmPassword;
-    private TextInputEditText etName, etSurname, etEmail, etPassword, etConfirmPassword;
+    private TextInputLayout tilNombre, tilApellidos, tilEmail, tilPassword, tilConfirmPassword;
+    private TextInputEditText etNombre, etApellidos, etEmail, etPassword, etConfirmPassword;
     private MaterialButton btnRegister;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -39,102 +39,102 @@ public class RegistroActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        tilName = findViewById(R.id.tilName);
-        tilSurname = findViewById(R.id.tilSurname);
+        tilNombre = findViewById(R.id.tilName);
+        tilApellidos = findViewById(R.id.tilSurname);
         tilEmail = findViewById(R.id.tilEmail);
         tilPassword = findViewById(R.id.tilPassword);
         tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
-        etName = findViewById(R.id.etName);
-        etSurname = findViewById(R.id.etSurname);
+        etNombre = findViewById(R.id.etName);
+        etApellidos = findViewById(R.id.etSurname);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnRegister = findViewById(R.id.btnRegister);
         TextView tvLogin = findViewById(R.id.tvLogin);
 
-        // Clear errors on typing
-        etName.addTextChangedListener(new SimpleTextWatcher(() -> tilName.setError(null)));
-        etSurname.addTextChangedListener(new SimpleTextWatcher(() -> tilSurname.setError(null)));
+        // Limpiar errores al escribir
+        etNombre.addTextChangedListener(new SimpleTextWatcher(() -> tilNombre.setError(null)));
+        etApellidos.addTextChangedListener(new SimpleTextWatcher(() -> tilApellidos.setError(null)));
         etEmail.addTextChangedListener(new SimpleTextWatcher(() -> tilEmail.setError(null)));
         etPassword.addTextChangedListener(new SimpleTextWatcher(() -> tilPassword.setError(null)));
         etConfirmPassword.addTextChangedListener(new SimpleTextWatcher(() -> tilConfirmPassword.setError(null)));
 
-        btnRegister.setOnClickListener(v -> registerUser());
+        btnRegister.setOnClickListener(v -> registrarUsuario());
         tvLogin.setOnClickListener(v -> finish());
     }
 
-    private void registerUser() {
-        String name = etName.getText() != null ? etName.getText().toString().trim() : "";
-        String surname = etSurname.getText() != null ? etSurname.getText().toString().trim() : "";
+    private void registrarUsuario() {
+        String nombre = etNombre.getText() != null ? etNombre.getText().toString().trim() : "";
+        String apellidos = etApellidos.getText() != null ? etApellidos.getText().toString().trim() : "";
         String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
         String password = etPassword.getText() != null ? etPassword.getText().toString().trim() : "";
-        String confirmPassword = etConfirmPassword.getText() != null ? etConfirmPassword.getText().toString().trim() : "";
+        String confirmarPassword = etConfirmPassword.getText() != null ? etConfirmPassword.getText().toString().trim() : "";
 
-        View focusView = null;
-        boolean hasError = false;
+        View vistaEnfoque = null;
+        boolean tieneError = false;
 
-        if (TextUtils.isEmpty(name)) {
-            tilName.setError("El nombre es obligatorio");
-            focusView = etName;
-            hasError = true;
+        if (TextUtils.isEmpty(nombre)) {
+            tilNombre.setError("El nombre es obligatorio");
+            vistaEnfoque = etNombre;
+            tieneError = true;
         }
 
-        if (TextUtils.isEmpty(surname)) {
-            tilSurname.setError("Los apellidos son obligatorios");
-            if (!hasError) focusView = etSurname;
-            hasError = true;
+        if (TextUtils.isEmpty(apellidos)) {
+            tilApellidos.setError("Los apellidos son obligatorios");
+            if (!tieneError) vistaEnfoque = etApellidos;
+            tieneError = true;
         }
 
         if (TextUtils.isEmpty(email)) {
             tilEmail.setError("El correo es obligatorio");
-            if (!hasError) focusView = etEmail;
-            hasError = true;
+            if (!tieneError) vistaEnfoque = etEmail;
+            tieneError = true;
         } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             tilEmail.setError("Formato de correo inválido");
-            if (!hasError) focusView = etEmail;
-            hasError = true;
+            if (!tieneError) vistaEnfoque = etEmail;
+            tieneError = true;
         }
 
         if (TextUtils.isEmpty(password)) {
             tilPassword.setError("La contraseña es obligatoria");
-            if (!hasError) focusView = etPassword;
-            hasError = true;
+            if (!tieneError) vistaEnfoque = etPassword;
+            tieneError = true;
         } else if (password.length() < 6) {
             tilPassword.setError("Mínimo 6 caracteres");
-            if (!hasError) focusView = etPassword;
-            hasError = true;
+            if (!tieneError) vistaEnfoque = etPassword;
+            tieneError = true;
         }
 
-        if (TextUtils.isEmpty(confirmPassword)) {
+        if (TextUtils.isEmpty(confirmarPassword)) {
             tilConfirmPassword.setError("Confirma la contraseña");
-            if (!hasError) focusView = etConfirmPassword;
-            hasError = true;
-        } else if (!password.equals(confirmPassword)) {
+            if (!tieneError) vistaEnfoque = etConfirmPassword;
+            tieneError = true;
+        } else if (!password.equals(confirmarPassword)) {
             tilConfirmPassword.setError("Las contraseñas no coinciden");
-            if (!hasError) focusView = etConfirmPassword;
-            hasError = true;
+            if (!tieneError) vistaEnfoque = etConfirmPassword;
+            tieneError = true;
         }
 
-        if (hasError) {
-            if (focusView != null) focusView.requestFocus();
+        if (tieneError) {
+            if (vistaEnfoque != null) vistaEnfoque.requestFocus();
             return;
         }
 
-        setLoading(true);
+        establecerCargando(true);
 
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful() && task.getResult().getUser() != null) {
-                        String uid = task.getResult().getUser().getUid();
+                .addOnCompleteListener(this, tarea -> {
+                    if (tarea.isSuccessful() && tarea.getResult().getUser() != null) {
+                        String uid = tarea.getResult().getUser().getUid();
                         String fechaAlta = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date());
 
-                        Usuario usuario = new Usuario(uid, name, surname, email, "suscriptor", "ninguno", fechaAlta);
+                        Usuario usuario = new Usuario(uid, nombre, apellidos, email, "suscriptor", "ninguno", fechaAlta);
 
                         db.collection("usuarios").document(uid)
                                 .set(usuario)
                                 .addOnSuccessListener(aVoid -> {
-                                    setLoading(false);
-                                    SessionManager.setEsInvitado(false);
+                                    establecerCargando(false);
+                                    GestorSesion.setEsInvitado(false);
                                     Mensajes.mostrarExito(btnRegister, "¡Cuenta creada con éxito!");
                                     Intent intent = new Intent(RegistroActivity.this, MainActivity.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -142,35 +142,35 @@ public class RegistroActivity extends AppCompatActivity {
                                     finish();
                                 })
                                 .addOnFailureListener(e -> {
-                                    setLoading(false);
+                                    establecerCargando(false);
                                     Mensajes.mostrarError(btnRegister, "Error al guardar datos: " + e.getMessage());
                                 });
                     } else {
-                        setLoading(false);
-                        String errorMsg = "Error al registrar usuario.";
-                        if (task.getException() != null) {
-                            String exMsg = task.getException().getMessage();
-                            if (exMsg != null && exMsg.contains("email-already-in-use")) {
-                                errorMsg = "El correo ya está registrado.";
-                            } else if (exMsg != null && exMsg.contains("network")) {
-                                errorMsg = "Sin conexión a internet.";
+                        establecerCargando(false);
+                        String mensajeError = "Error al registrar usuario.";
+                        if (tarea.getException() != null) {
+                            String exMensaje = tarea.getException().getMessage();
+                            if (exMensaje != null && exMensaje.contains("email-already-in-use")) {
+                                mensajeError = "El correo ya está registrado.";
+                            } else if (exMensaje != null && exMensaje.contains("network")) {
+                                mensajeError = "Sin conexión a internet.";
                             }
                         }
-                        Mensajes.mostrarError(btnRegister, errorMsg);
+                        Mensajes.mostrarError(btnRegister, mensajeError);
                     }
                 });
     }
 
-    private void setLoading(boolean isLoading) {
-        btnRegister.setEnabled(!isLoading);
-        btnRegister.setText(isLoading ? "Registrando..." : getString(R.string.register_button));
+    private void establecerCargando(boolean cargando) {
+        btnRegister.setEnabled(!cargando);
+        btnRegister.setText(cargando ? "Registrando..." : getString(R.string.register_button));
     }
 
     private static class SimpleTextWatcher implements TextWatcher {
-        private final Runnable onTextChanged;
+        private final Runnable alCambiarTexto;
 
-        public SimpleTextWatcher(Runnable onTextChanged) {
-            this.onTextChanged = onTextChanged;
+        public SimpleTextWatcher(Runnable alCambiarTexto) {
+            this.alCambiarTexto = alCambiarTexto;
         }
 
         @Override
@@ -178,7 +178,7 @@ public class RegistroActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            onTextChanged.run();
+            alCambiarTexto.run();
         }
 
         @Override

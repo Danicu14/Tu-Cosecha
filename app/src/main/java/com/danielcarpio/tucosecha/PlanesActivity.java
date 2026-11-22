@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.danielcarpio.tucosecha.adapter.PlanAdapter;
 import com.danielcarpio.tucosecha.model.Plan;
 import com.danielcarpio.tucosecha.ui.fragments.DetallePlanBottomSheet;
-import com.danielcarpio.tucosecha.util.SessionManager;
+import com.danielcarpio.tucosecha.util.GestorSesion;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -22,7 +22,7 @@ public class PlanesActivity extends AppCompatActivity {
 
     private RecyclerView rvPlanes;
     private PlanAdapter planAdapter;
-    private List<Plan> planList;
+    private List<Plan> listaPlanes;
     private FirebaseFirestore db;
 
     @Override
@@ -37,9 +37,9 @@ public class PlanesActivity extends AppCompatActivity {
 
         rvPlanes = findViewById(R.id.rvPlanesActivity);
         rvPlanes.setLayoutManager(new LinearLayoutManager(this));
-        planList = new ArrayList<>();
-        planAdapter = new PlanAdapter(this, planList, plan -> {
-            if (SessionManager.isEsInvitado()) {
+        listaPlanes = new ArrayList<>();
+        planAdapter = new PlanAdapter(this, listaPlanes, plan -> {
+            if (GestorSesion.esInvitado()) {
                 startActivity(new Intent(PlanesActivity.this, LoginActivity.class));
             } else {
                 DetallePlanBottomSheet bottomSheet = DetallePlanBottomSheet.newInstance(plan);
@@ -48,19 +48,19 @@ public class PlanesActivity extends AppCompatActivity {
         });
         rvPlanes.setAdapter(planAdapter);
 
-        loadPlanesRealtime();
+        cargarPlanesEnTiempoReal();
     }
 
-    private void loadPlanesRealtime() {
+    private void cargarPlanesEnTiempoReal() {
         db.collection("planes").addSnapshotListener((value, error) -> {
             if (value != null) {
-                planList.clear();
+                listaPlanes.clear();
                 for (QueryDocumentSnapshot doc : value) {
                     Plan plan = doc.toObject(Plan.class);
                     if (plan.getId() == null || plan.getId().isEmpty()) {
                         plan.setId(doc.getId());
                     }
-                    planList.add(plan);
+                    listaPlanes.add(plan);
                 }
                 planAdapter.notifyDataSetChanged();
             }

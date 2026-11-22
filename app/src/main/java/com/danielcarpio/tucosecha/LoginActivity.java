@@ -9,8 +9,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.danielcarpio.tucosecha.util.GestorSesion;
 import com.danielcarpio.tucosecha.util.Mensajes;
-import com.danielcarpio.tucosecha.util.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -40,14 +40,14 @@ public class LoginActivity extends AppCompatActivity {
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
         tvRegister = findViewById(R.id.tvRegister);
 
-        // Clear errors on typing
+        // Limpiar errores al escribir
         etEmail.addTextChangedListener(new SimpleTextWatcher(() -> tilEmail.setError(null)));
         etPassword.addTextChangedListener(new SimpleTextWatcher(() -> tilPassword.setError(null)));
 
-        btnLogin.setOnClickListener(v -> loginUser());
+        btnLogin.setOnClickListener(v -> iniciarSesionUsuario());
 
         btnGuest.setOnClickListener(v -> {
-            SessionManager.setEsInvitado(true);
+            GestorSesion.setEsInvitado(true);
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -59,70 +59,70 @@ public class LoginActivity extends AppCompatActivity {
         tvRegister.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, RegistroActivity.class)));
     }
 
-    private void loginUser() {
-        String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
-        String password = etPassword.getText() != null ? etPassword.getText().toString().trim() : "";
+    private void iniciarSesionUsuario() {
+        String correo = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
+        String contrasena = etPassword.getText() != null ? etPassword.getText().toString().trim() : "";
 
-        boolean hasError = false;
+        boolean tieneError = false;
 
-        if (TextUtils.isEmpty(email)) {
+        if (TextUtils.isEmpty(correo)) {
             tilEmail.setError("El correo electrónico es obligatorio");
-            hasError = true;
+            tieneError = true;
         }
 
-        if (TextUtils.isEmpty(password)) {
+        if (TextUtils.isEmpty(contrasena)) {
             tilPassword.setError("La contraseña es obligatoria");
-            hasError = true;
+            tieneError = true;
         }
 
-        if (hasError) {
-            if (TextUtils.isEmpty(email)) {
+        if (tieneError) {
+            if (TextUtils.isEmpty(correo)) {
                 etEmail.requestFocus();
-            } else if (TextUtils.isEmpty(password)) {
+            } else if (TextUtils.isEmpty(contrasena)) {
                 etPassword.requestFocus();
             }
             return;
         }
 
-        // Loading state
-        setLoading(true);
+        // Estado de carga
+        establecerCargando(true);
 
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    setLoading(false);
-                    if (task.isSuccessful()) {
-                        SessionManager.setEsInvitado(false);
+        mAuth.signInWithEmailAndPassword(correo, contrasena)
+                .addOnCompleteListener(this, tarea -> {
+                    establecerCargando(false);
+                    if (tarea.isSuccessful()) {
+                        GestorSesion.setEsInvitado(false);
                         Mensajes.mostrarExito(btnLogin, "¡Bienvenido de nuevo!");
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                         finish();
                     } else {
-                        String errorMsg = "Error al iniciar sesión. Comprueba tus credenciales.";
-                        if (task.getException() != null) {
-                            String exMsg = task.getException().getMessage();
-                            if (exMsg != null && exMsg.contains("network")) {
-                                errorMsg = "Sin conexión a internet.";
-                            } else if (exMsg != null && (exMsg.contains("password") || exMsg.contains("user") || exMsg.contains("no user"))) {
-                                errorMsg = "Credenciales incorrectas o usuario no registrado.";
+                        String mensajeError = "Error al iniciar sesión. Comprueba tus credenciales.";
+                        if (tarea.getException() != null) {
+                            String exMensaje = tarea.getException().getMessage();
+                            if (exMensaje != null && exMensaje.contains("network")) {
+                                mensajeError = "Sin conexión a internet.";
+                            } else if (exMensaje != null && (exMensaje.contains("password") || exMensaje.contains("user") || exMensaje.contains("no user"))) {
+                                mensajeError = "Credenciales incorrectas o usuario no registrado.";
                             }
                         }
-                        Mensajes.mostrarError(btnLogin, errorMsg);
+                        Mensajes.mostrarError(btnLogin, mensajeError);
                     }
                 });
     }
 
-    private void setLoading(boolean isLoading) {
-        btnLogin.setEnabled(!isLoading);
-        btnGuest.setEnabled(!isLoading);
-        btnLogin.setText(isLoading ? "Iniciando sesión..." : getString(R.string.login_button));
+    private void establecerCargando(boolean cargando) {
+        btnLogin.setEnabled(!cargando);
+        btnGuest.setEnabled(!cargando);
+        btnLogin.setText(cargando ? "Iniciando sesión..." : getString(R.string.login_button));
     }
 
     private static class SimpleTextWatcher implements TextWatcher {
-        private final Runnable onTextChanged;
+        private final Runnable alCambiarTexto;
 
-        public SimpleTextWatcher(Runnable onTextChanged) {
-            this.onTextChanged = onTextChanged;
+        public SimpleTextWatcher(Runnable alCambiarTexto) {
+            this.alCambiarTexto = alCambiarTexto;
         }
 
         @Override
@@ -130,7 +130,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            onTextChanged.run();
+            alCambiarTexto.run();
         }
 
         @Override

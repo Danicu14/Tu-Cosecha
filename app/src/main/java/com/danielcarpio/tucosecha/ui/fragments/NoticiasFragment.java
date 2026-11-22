@@ -20,8 +20,8 @@ import com.danielcarpio.tucosecha.NuevaNoticiaActivity;
 import com.danielcarpio.tucosecha.R;
 import com.danielcarpio.tucosecha.adapter.NoticiaAdapter;
 import com.danielcarpio.tucosecha.model.Noticia;
+import com.danielcarpio.tucosecha.util.GestorSesion;
 import com.danielcarpio.tucosecha.util.Mensajes;
-import com.danielcarpio.tucosecha.util.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -45,10 +45,10 @@ public class NoticiasFragment extends Fragment {
     private FloatingActionButton fabNuevaNoticia;
 
     private FirebaseFirestore db;
-    private List<Noticia> noticiaList;
+    private List<Noticia> listaNoticias;
     private NoticiaAdapter adapter;
-    private ListenerRegistration listenerRegistration;
-    private boolean isAdmin = false;
+    private ListenerRegistration listenerRegistro;
+    private boolean esAdmin = false;
 
     @Nullable
     @Override
@@ -65,8 +65,8 @@ public class NoticiasFragment extends Fragment {
         fabNuevaNoticia = view.findViewById(R.id.fabNuevaNoticia);
 
         rvNoticias.setLayoutManager(new LinearLayoutManager(getContext()));
-        noticiaList = new ArrayList<>();
-        adapter = new NoticiaAdapter(getContext(), noticiaList, new NoticiaAdapter.OnNoticiaClickListener() {
+        listaNoticias = new ArrayList<>();
+        adapter = new NoticiaAdapter(getContext(), listaNoticias, new NoticiaAdapter.ListenerNoticia() {
             @Override
             public void onNoticiaClick(Noticia noticia) {
                 DetalleNoticiaBottomSheet bottomSheet = DetalleNoticiaBottomSheet.newInstance(noticia);
@@ -75,7 +75,7 @@ public class NoticiasFragment extends Fragment {
 
             @Override
             public void onNoticiaLongClick(Noticia noticia) {
-                if (isAdmin) {
+                if (esAdmin) {
                     new MaterialAlertDialogBuilder(requireContext())
                             .setTitle("Eliminar noticia")
                             .setMessage("¿Estás seguro de que deseas eliminar esta noticia?")
@@ -94,9 +94,9 @@ public class NoticiasFragment extends Fragment {
         });
         rvNoticias.setAdapter(adapter);
 
-        checkAdminRoleAndLoad();
+        verificarRolAdminYCargar();
 
-        btnNoticiasRetry.setOnClickListener(v -> loadNoticiasRealtime());
+        btnNoticiasRetry.setOnClickListener(v -> cargarNoticiasEnTiempoReal());
 
         fabNuevaNoticia.setOnClickListener(v -> {
             startActivity(new Intent(getActivity(), NuevaNoticiaActivity.class));
@@ -105,48 +105,48 @@ public class NoticiasFragment extends Fragment {
         return view;
     }
 
-    private void checkAdminRoleAndLoad() {
-        if (SessionManager.isEsInvitado()) {
-            isAdmin = false;
+    private void verificarRolAdminYCargar() {
+        if (GestorSesion.esInvitado()) {
+            esAdmin = false;
             fabNuevaNoticia.setVisibility(View.GONE);
-            loadNoticiasRealtime();
+            cargarNoticiasEnTiempoReal();
             return;
         }
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            db.collection("usuarios").document(user.getUid()).get()
+        FirebaseUser usuario = FirebaseAuth.getInstance().getCurrentUser();
+        if (usuario != null) {
+            db.collection("usuarios").document(usuario.getUid()).get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
                             String rol = documentSnapshot.getString("rol");
-                            isAdmin = "administrador".equalsIgnoreCase(rol);
-                            if (isAdmin) {
+                            esAdmin = "administrador".equalsIgnoreCase(rol);
+                            if (esAdmin) {
                                 fabNuevaNoticia.setVisibility(View.VISIBLE);
                             } else {
                                 fabNuevaNoticia.setVisibility(View.GONE);
                             }
                         }
-                        loadNoticiasRealtime();
+                        cargarNoticiasEnTiempoReal();
                     })
-                    .addOnFailureListener(e -> loadNoticiasRealtime());
+                    .addOnFailureListener(e -> cargarNoticiasEnTiempoReal());
         } else {
-            loadNoticiasRealtime();
+            cargarNoticiasEnTiempoReal();
         }
     }
 
-    private void loadNoticiasRealtime() {
+    private void cargarNoticiasEnTiempoReal() {
         progressBarNoticiasLoading.setVisibility(View.VISIBLE);
         tvNoticiasEmptyState.setVisibility(View.GONE);
         layoutNoticiasErrorState.setVisibility(View.GONE);
         rvNoticias.setVisibility(View.GONE);
 
-        if (listenerRegistration != null) {
-            listenerRegistration.remove();
+        if (listenerRegistro != null) {
+            listenerRegistro.remove();
         }
 
-        listenerRegistration = db.collection("noticias")
+        listenerRegistro = db.collection("noticias")
                 .orderBy("fecha", Query.Direction.DESCENDING)
-                .addSnapshotListener((value, error) -> {
+                .addSnapshotListener((valor, error) -> {
                     if (!isAdded()) return;
 
                     progressBarNoticiasLoading.setVisibility(View.GONE);
@@ -160,19 +160,19 @@ public class NoticiasFragment extends Fragment {
                         return;
                     }
 
-                    if (value != null) {
-                        noticiaList.clear();
-                        for (QueryDocumentSnapshot doc : value) {
+                    if (valor != null) {
+                        listaNoticias.clear();
+                        for (QueryDocumentSnapshot doc : valor) {
                             Noticia noticia = doc.toObject(Noticia.class);
                             if (noticia.getId() == null || noticia.getId().isEmpty()) {
                                 noticia.setId(doc.getId());
                             }
-                            noticiaList.add(noticia);
+                            listaNoticias.add(noticia);
                         }
 
                         adapter.notifyDataSetChanged();
 
-                        if (noticiaList.isEmpty()) {
+                        if (listaNoticias.isEmpty()) {
                             tvNoticiasEmptyState.setVisibility(View.VISIBLE);
                             rvNoticias.setVisibility(View.GONE);
                         } else {
@@ -186,9 +186,9 @@ public class NoticiasFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (listenerRegistration != null) {
-            listenerRegistration.remove();
-            listenerRegistration = null;
+        if (listenerRegistro != null) {
+            listenerRegistro.remove();
+            listenerRegistro = null;
         }
     }
 }
