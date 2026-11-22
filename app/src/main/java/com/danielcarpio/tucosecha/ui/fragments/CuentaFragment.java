@@ -77,55 +77,71 @@ public class CuentaFragment extends Fragment {
         btnRegisterFromAccount = view.findViewById(R.id.btnRegisterFromAccount);
 
         if (GestorSesion.esInvitado()) {
-            layoutGuestAccount.setVisibility(View.VISIBLE);
-            layoutLoggedAccount.setVisibility(View.GONE);
+            if (layoutGuestAccount != null) layoutGuestAccount.setVisibility(View.VISIBLE);
+            if (layoutLoggedAccount != null) layoutLoggedAccount.setVisibility(View.GONE);
 
-            btnLoginFromAccount.setOnClickListener(v -> {
-                startActivity(new Intent(getActivity(), LoginActivity.class));
-                if (getActivity() != null) getActivity().finish();
-            });
+            if (btnLoginFromAccount != null) {
+                btnLoginFromAccount.setOnClickListener(v -> {
+                    startActivity(new Intent(getActivity(), LoginActivity.class));
+                    if (getActivity() != null) getActivity().finish();
+                });
+            }
 
-            btnRegisterFromAccount.setOnClickListener(v -> {
-                startActivity(new Intent(getActivity(), RegistroActivity.class));
-            });
+            if (btnRegisterFromAccount != null) {
+                btnRegisterFromAccount.setOnClickListener(v -> {
+                    startActivity(new Intent(getActivity(), RegistroActivity.class));
+                });
+            }
         } else {
-            layoutGuestAccount.setVisibility(View.GONE);
-            layoutLoggedAccount.setVisibility(View.VISIBLE);
+            if (layoutGuestAccount != null) layoutGuestAccount.setVisibility(View.GONE);
+            if (layoutLoggedAccount != null) layoutLoggedAccount.setVisibility(View.VISIBLE);
             cargarDatosUsuario();
         }
 
-        btnMyPlan.setOnClickListener(v -> {
-            if (GestorSesion.esInvitado()) {
-                mostrarDialogoAccesoInvitado();
-            } else {
-                startActivity(new Intent(getActivity(), MiPlanActivity.class));
-            }
-        });
+        if (btnMyPlan != null) {
+            btnMyPlan.setOnClickListener(v -> {
+                if (GestorSesion.esInvitado()) {
+                    mostrarDialogoAccesoInvitado();
+                } else {
+                    startActivity(new Intent(getActivity(), MiPlanActivity.class));
+                }
+            });
+        }
 
-        btnMisDatos.setOnClickListener(v -> {
-            if (GestorSesion.esInvitado()) {
-                mostrarDialogoAccesoInvitado();
-            } else {
-                startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.MisDatosActivity.class));
-            }
-        });
+        if (btnMisDatos != null) {
+            btnMisDatos.setOnClickListener(v -> {
+                if (GestorSesion.esInvitado()) {
+                    mostrarDialogoAccesoInvitado();
+                } else {
+                    startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.MisDatosActivity.class));
+                }
+            });
+        }
 
-        btnMisPedidos.setOnClickListener(v -> {
-            if (GestorSesion.esInvitado()) {
-                mostrarDialogoAccesoInvitado();
-            } else {
-                startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.MisPedidosActivity.class));
-            }
-        });
+        if (btnMisPedidos != null) {
+            btnMisPedidos.setOnClickListener(v -> {
+                if (GestorSesion.esInvitado()) {
+                    mostrarDialogoAccesoInvitado();
+                } else {
+                    startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.MisPedidosActivity.class));
+                }
+            });
+        }
 
         View tarjetaOpcionMiPlan = view.findViewById(R.id.cardOptionMiPlan);
-        if (tarjetaOpcionMiPlan != null) tarjetaOpcionMiPlan.setOnClickListener(v -> btnMyPlan.performClick());
+        if (tarjetaOpcionMiPlan != null) tarjetaOpcionMiPlan.setOnClickListener(v -> {
+            if (btnMyPlan != null) btnMyPlan.performClick();
+        });
 
         View tarjetaOpcionMisDatos = view.findViewById(R.id.cardOptionMisDatos);
-        if (tarjetaOpcionMisDatos != null) tarjetaOpcionMisDatos.setOnClickListener(v -> btnMisDatos.performClick());
+        if (tarjetaOpcionMisDatos != null) tarjetaOpcionMisDatos.setOnClickListener(v -> {
+            if (btnMisDatos != null) btnMisDatos.performClick();
+        });
 
         View tarjetaOpcionMisPedidos = view.findViewById(R.id.cardOptionMisPedidos);
-        if (tarjetaOpcionMisPedidos != null) tarjetaOpcionMisPedidos.setOnClickListener(v -> btnMisPedidos.performClick());
+        if (tarjetaOpcionMisPedidos != null) tarjetaOpcionMisPedidos.setOnClickListener(v -> {
+            if (btnMisPedidos != null) btnMisPedidos.performClick();
+        });
 
         if (btnOptionPedidosAdmin != null) {
             btnOptionPedidosAdmin.setOnClickListener(v -> startActivity(new Intent(getActivity(), com.danielcarpio.tucosecha.PedidosAdminActivity.class)));
@@ -241,16 +257,18 @@ public class CuentaFragment extends Fragment {
             });
         }
 
-        btnLogout.setOnClickListener(v -> {
-            mAuth.signOut();
-            GestorSesion.setEsInvitado(false);
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            if (getActivity() != null) {
-                getActivity().finish();
-            }
-        });
+        if (btnLogout != null) {
+            btnLogout.setOnClickListener(v -> {
+                mAuth.signOut();
+                GestorSesion.setEsInvitado(false);
+                Intent intent = new Intent(getActivity(), LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                if (getActivity() != null) {
+                    getActivity().finish();
+                }
+            });
+        }
 
         return view;
     }
@@ -282,28 +300,29 @@ public class CuentaFragment extends Fragment {
                                 String nombre = usuario.getNombre() != null ? usuario.getNombre() : "";
                                 String apellidos = usuario.getApellidos() != null ? usuario.getApellidos() : "";
 
-                                tvUserName.setText(nombre + " " + apellidos);
-                                tvUserEmail.setText(usuario.getEmail());
+                                if (tvUserName != null) tvUserName.setText(nombre + " " + apellidos);
+                                if (tvUserEmail != null) tvUserEmail.setText(usuario.getEmail());
 
                                 if ("administrador".equalsIgnoreCase(usuario.getRol())) {
-                                    cardAdminTools.setVisibility(View.VISIBLE);
+                                    if (cardAdminTools != null) cardAdminTools.setVisibility(View.VISIBLE);
                                     if (cardPanelHortelano != null) cardPanelHortelano.setVisibility(View.VISIBLE);
                                     escucharSolicitudesCancelacion();
                                 } else {
-                                    cardAdminTools.setVisibility(View.GONE);
+                                    if (cardAdminTools != null) cardAdminTools.setVisibility(View.GONE);
                                     if (cardPanelHortelano != null) cardPanelHortelano.setVisibility(View.GONE);
                                     detenerEscuchaCancelaciones();
                                 }
 
                                 String plan = usuario.getPlan() != null ? usuario.getPlan() : "ninguno";
-                                chipPlan.setText("Plan: " + plan);
-
-                                if (plan.equalsIgnoreCase("ninguno")) {
-                                    chipPlan.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#E0E0E0")));
-                                    chipPlan.setTextColor(Color.parseColor("#424242"));
-                                } else {
-                                    chipPlan.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#C8E6C9")));
-                                    chipPlan.setTextColor(Color.parseColor("#1F5A2A"));
+                                if (chipPlan != null) {
+                                    chipPlan.setText("Plan: " + plan);
+                                    if (plan.equalsIgnoreCase("ninguno")) {
+                                        chipPlan.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#E0E0E0")));
+                                        chipPlan.setTextColor(Color.parseColor("#424242"));
+                                    } else {
+                                        chipPlan.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#C8E6C9")));
+                                        chipPlan.setTextColor(Color.parseColor("#1F5A2A"));
+                                    }
                                 }
 
                                 String iniciales = "";
@@ -316,15 +335,15 @@ public class CuentaFragment extends Fragment {
                                 if (iniciales.isEmpty()) {
                                     iniciales = "TC";
                                 }
-                                tvUserInitials.setText(iniciales);
+                                if (tvUserInitials != null) tvUserInitials.setText(iniciales);
                             }
                         } else {
-                            tvUserName.setText("No se encontró información del usuario.");
+                            if (tvUserName != null) tvUserName.setText("No se encontró información del usuario.");
                         }
                     })
                     .addOnFailureListener(e -> {
                         Log.e("CARGA_DATOS", "Error al cargar datos de usuario: " + e.getMessage(), e);
-                        Mensajes.mostrarError(tvUserName, "Error al cargar datos: " + e.getMessage());
+                        if (tvUserName != null) Mensajes.mostrarError(tvUserName, "Error al cargar datos: " + e.getMessage());
                     });
         }
     }
