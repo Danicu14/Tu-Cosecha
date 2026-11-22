@@ -134,7 +134,7 @@
         android:layout_width="0dp"
         android:layout_height="54dp"
         android:layout_marginTop="12dp"
-        android:text="Entrar para conocer"
+        android:text="Conócenos"
         android:textColor="#286B28"
         app:backgroundTint="#E6F1D9"
         app:cornerRadius="27dp"

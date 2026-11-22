@@ -28,8 +28,8 @@ import com.danielcarpio.tucosecha.model.Cosecha;
 import com.danielcarpio.tucosecha.model.Cultivo;
 import com.danielcarpio.tucosecha.model.Pedido;
 import com.danielcarpio.tucosecha.model.ProductoCosecha;
+import com.danielcarpio.tucosecha.util.GestorSesion;
 import com.danielcarpio.tucosecha.util.Mensajes;
-import com.danielcarpio.tucosecha.util.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -121,7 +121,7 @@ public class CestaFragment extends Fragment {
             tvSubTitle.setText("Toca un producto para añadirlo a tu lista");
         }
 
-        if (SessionManager.isEsInvitado()) {
+        if (GestorSesion.esInvitado()) {
             userPlan = "invitado";
             maxVariedades = 0;
             planNombre = "Invitado";
